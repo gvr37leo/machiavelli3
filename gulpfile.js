@@ -30,7 +30,7 @@ function transpile(cb) {
     })
     .plugin(tsify)
     .transform("babelify", {
-        presets: ["es2015"],
+        presets: ["es2015","react"],
         extensions: [".ts",".tsx"],
     })
     .bundle()
@@ -66,5 +66,5 @@ function livereload(cb) {
   
 exports.transpile = transpile;
 exports.default = function(){
-    watch(['src/*.ts','src/*.tsx'], { ignoreInitial: false },series(clean, transpile))
+    watch(['src/*.{ts,tsx}'], { ignoreInitial: false },series(clean, transpile))
 }

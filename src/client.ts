@@ -87,7 +87,7 @@ export class Client{
     }
 
     updateHtml(){
-        this.root = MainApp({client:this})
+        // this.root = MainApp({client:this})
         // renderHTML()
     }
 
