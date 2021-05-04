@@ -1,3 +1,4 @@
+import React from 'react'
 import { Client } from '../../client'
 import { Player } from '../models'
 

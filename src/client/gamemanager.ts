@@ -430,7 +430,7 @@ export class GameManager{
 
     processTaxes(role:Role){
         var player = this.db.get(role.player) as Player
-        player.money += player.childByName('board')._children().filter((c:Card) => c.role == role.id).length
+        player.money += player.childByName('board')._children().filter((c:any) => c.role == role.id).length
         player.flag()
     }
 

@@ -1,3 +1,4 @@
+import React from 'react'
 import { Card } from '../models'
 
 export function CardView(props:{card:Card,onClick}){

@@ -1,3 +1,4 @@
+import React from 'react'
 import { Client } from "../../client"
 
 export function GameWonScreen(props:{client:Client}){

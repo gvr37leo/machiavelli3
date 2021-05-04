@@ -1,10 +1,10 @@
 // import { GameManager } from './client/gamemanager'
 import React from 'react'
 import ReactDOM from 'react-dom'
-// import {Client} from './client'
+import {Client} from './client'
 
-// var client = new Client()
-// client.updateHtml()
+var client = new Client()
+client.updateHtml()
 
 
 // var gamemanager = new GameManager()

@@ -1,3 +1,5 @@
+import React from 'react'
+
 export function Modal(props:{visible?:boolean,children?:any}){
 
     return (
