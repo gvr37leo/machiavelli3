@@ -15,7 +15,7 @@ export class Helper{
     }
 
     getGame():Game{
-        return this.gameroot as Game
+        return this.db.list().find(e => e.name == 'gameroot') as Game
     }
 
     getPlayers():Player[]{
@@ -36,5 +36,13 @@ export class Helper{
 
     getRoles():Role[]{
         return this.getGame().childByName('roles')._children() as Role[]
+    }
+
+    getClientPlayer(clientid):Player{
+        return this.getPlayers().find(p => p.clientid == clientid)
+    }
+
+    getSessionPlayer(sessionid):Player{
+        return this.getPlayers().find(p => p.sessionid == sessionid)
     }
 }

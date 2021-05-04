@@ -1,61 +1,58 @@
+import React from "react"
+import { Client } from "../../client"
+import { Card } from "../models"
+import { CardView } from "./card"
+import { Modal } from "./modal"
+import { RenderPlayer } from "./player"
 
-function RenderHomepage(props:{client:Client}){
+export function RenderHomepage(props:{client:Client}){
     var game = props.client.helper.getGame()
     var players = props.client.helper.getPlayers()
-    var topcard = props.client.helper.getTopCardDiscardPile()
-    var clientplayer = props.client.helper.getSessionPlayer(props.client.sessionid)
-    var clientplayercards = clientplayer._children(() => true)
+    var sessionplayer = props.client.helper.getSessionPlayer(props.client.sessionid)
+    var boardcards = sessionplayer.childByName('board')._children() as Card[]
+    var handcards = sessionplayer.childByName('hand')._children() as Card[]
     var currentplayer = props.client.helper.getCurrentPlayer()
 
     return (
         <React.Fragment>
             <div style={{display:"flex",flexDirection:"column", minHeight:"100vh", justifyContent:"space-between"}}>
-                <div style={{display:"flex", flexGrow: '1' ,alignItems: 'center'}}>
+                <div style={{display:"flex", flexGrow: 1 ,alignItems: 'center'}}>
                     <div style={{marginLeft:'40px'}}>
                         {players.map(p => <RenderPlayer client={props.client} onClick={() => {
-                        
+                            //show board/hand for this player
                         }} key={p.id} player={p} />)}
                     </div>
-                    <div style={{flexGrow:'1',display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:"center"}}>
-
-                        {(() => {
-                            if(game.bullycounter > 0 && clientplayer.id == currentplayer.id){
-                                return <div style={{cursor:'pointer', border:'1px solid white', margin:'40px', padding:'10px'}} onClick={() => {
-                                    props.client.output.trigger({type:'acceptcards',data:null})
-                                }}>accept cards {game.bullycounter}</div>
-                            }else{
-                                return null
-                            }
-                        })()}
+                    <div style={{flexGrow:1,display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:"center"}}>
+                        <div style={{cursor:'pointer', border:'1px solid white', margin:'40px', padding:'10px'}} onClick={() => {
+                            props.client.output.trigger({type:'specialability',data:null})
+                        }}>special</div>
 
                         <div style={{cursor:'pointer', border:'1px solid white', margin:'40px', padding:'10px'}} onClick={() => {
                             props.client.output.trigger({type:'pass',data:null})
-                        }}>
-                            <div>draw a card and pass</div>
-                            <div>{props.client.helper.getDeckCards().length} remaining</div>
-                        </div>
-                        <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
-                            {(() => {
-                                if(topcard.rank.name == 'jack'){
-                                    return <img width="40" style={{background:'white',borderRadius:'3px'}} src={game.currentHouse.iconuri}/>
-                                }
-                            })()}
-                            <CardComp card={topcard} />
-                        </div>
+                        }}>pass</div>
                     </div>
                 </div>
                 <div style={{display:"flex", justifyContent:"center", flexWrap:"wrap", overflow:"auto", margin:"20px", border:"1px solid white"}}>
-                    {clientplayercards.map((c:Card) => <CardComp onClick={() => {
+                    {boardcards.map((c:Card) => <CardView onClick={() => {
+                        
+                    }} key={c.id} card={c} />)}
+                </div>
+                <div style={{display:"flex", justifyContent:"center", flexWrap:"wrap", overflow:"auto", margin:"20px", border:"1px solid white"}}>
+                    {handcards.map((c:Card) => <CardView onClick={() => {
                         props.client.output.trigger({type:'playcard',data:c.id})
                     }} key={c.id} card={c} />)}
                 </div>
             </div>
-            <Modal visible={clientplayer.isDiscoveringHouse}>
+            <Modal visible={sessionplayer.isDiscovering}>
                 <div style={{padding:"20px", display:"flex", justifyContent:"center", flexWrap:"wrap"}}>
-                    {clientplayer.discoverHouseOptions.map((house,i) => {
-                        return <img key={i} width="180px" style={{cursor:"pointer", margin:"20px"}} src={`./resources/K${house.abbr}.jpg`}  onClick={() => {
-                            props.client.output.trigger({type:'completediscovery',data:{data:house,id:clientplayer.discoverid}})
-                        }}></img>
+                    {sessionplayer.discoverOptions.map((option,i) => {
+                        return <div>
+                            {option.description}
+                            {option.value}
+                            <img key={i} width="180px" style={{cursor:"pointer", margin:"20px"}} src={`./resources/K${option.image}.jpg`}  onClick={() => {
+                                props.client.output.trigger({type:'completediscovery',data:{data:option,id:sessionplayer.discoverid}})
+                            }}></img>
+                        </div>
                     })}
                 </div>
             </Modal>

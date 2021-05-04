@@ -1,22 +1,23 @@
+import React from "react"
+import { Client } from "../../client"
+import { GameWonScreen } from "./gamewonscreen"
+import { RenderHomepage } from "./homepage"
+import { StartScreen } from "./startscreen"
+
+
 var shown = false
 
 export function MainApp(props:{client:Client}){
+    var client = props.client
     var game = props.client.helper.getGame()
     var players = props.client.helper.getPlayers()
     var sessionplayer = props.client.helper.getSessionPlayer(props.client.sessionid)
     var discardpile = props.client.helper.getDiscardPile()
-    var deck = props.client.helper.getDeckContainer()
+    var deck = props.client.helper.getDeckFolder()
 
 
     return (
         <React.Fragment>
-            <div>
-                {(() => {
-                    return props.client.helper.store.list().filter(e => e.type == 'card').map((c:any,i) => {
-                        return <img key={i} style={{display:"none"}} src={c.url}></img>
-                    })
-                })()}
-            </div>
             {(() => {
                 //check if clientplayer has a name
                 if(sessionplayer.name == ''){
@@ -65,8 +66,6 @@ export function MainApp(props:{client:Client}){
                             <div>clientid:{props.client.id}</div>
                             <div>sessionid:{props.client.sessionid}</div>
                             <div>dbversion:{props.client.lastprocessedversion}</div>
-                            <div>discardpile:{discardpile.children.length}</div>
-                            <div>deck:{deck.children.length}</div>
                         </React.Fragment>
                     }
                 })()}

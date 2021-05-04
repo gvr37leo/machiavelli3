@@ -290,7 +290,7 @@ export class GameManager{
                         
                     }
                 })
-            }else if(role.name == 'koning'){
+            }else if(role.name == 'koning'){//some of these abilities can be automated at start of turn
                 game.crownwearerid = player.id
                 game.flag()
                 this.processTaxes(role)

@@ -1,4 +1,6 @@
-function StartScreen(props:{client:Client}){
+import { Client } from "../../client"
+
+export function StartScreen(props:{client:Client}){
     return <div style={{display:"flex", justifyContent:"center", alignItems:"center", height:"100vh"}} >
         <div>
             <input placeholder="Name" id="name" style={{marginRight:"20px", padding:"10px"}}/>

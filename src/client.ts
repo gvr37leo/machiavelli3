@@ -1,11 +1,17 @@
+import { Helper } from './client/helper'
 import {EventSystem} from './libs/event/eventsystem'
 import {EntityStore,Entity} from './libs/utils/store'
+import { to } from './libs/utils/utils'
+import {MainApp} from './client/tsx/mainapp'
+
+declare var toastr
 
 export class Client{
 
     root:JSX.Element
     output = new EventSystem<{type,data}>()
     entityStore:EntityStore
+    helper:Helper
     id = null
     sessionid = null
     lastprocessedversion = null
@@ -82,7 +88,7 @@ export class Client{
 
     updateHtml(){
         this.root = MainApp({client:this})
-        renderHTML()
+        // renderHTML()
     }
 
     deserialize(data:any[]){
