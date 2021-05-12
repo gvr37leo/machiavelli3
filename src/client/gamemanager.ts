@@ -9,9 +9,10 @@ import {Helper} from './helper'
 export class GameManager{
 
     store = new EntityStore()
-    eventQueue = new EventQueue()
+    input = new EventQueue()
+    output = new EventSystem<{sessionid:number,type:string,data}>()
+    
     broadcastEvent = new EventSystem<{type:string,data}>()
-    sendEvent = new EventSystem<{sessionid:number,type:string,data}>()
     rng = new RNG(Math.floor(Math.random() * 100000))
     helper:Helper
     gameroot: Entity
@@ -22,11 +23,11 @@ export class GameManager{
 
     setupListeners(){
 
-        this.eventQueue.onRuleBroken.listen(e => {
-            this.sendEvent.trigger({type:'error',sessionid:e.event.data.sessionid,data:e.error})
+        this.input.onRuleBroken.listen(e => {
+            this.output.trigger({type:'error',sessionid:e.event.data.sessionid,data:e.error})
         })
 
-        this.eventQueue.listen('init',() => {
+        this.input.listen('init',() => {
             this.store = new EntityStore()
             this.helper = new Helper(this.store)
             var game = this.store.add(new Game({name:'gameroot'}),null)
@@ -44,17 +45,17 @@ export class GameManager{
             var koopman = this.store.add(new Role({name:'koopman',color:'green',image:'/res/koopman.png'}),rolesfolder)
             var bouwmeester = this.store.add(new Role({name:'bouwmeester',color:'white',image:'/res/bouwmeester.png'}),rolesfolder)
             var condotierre = this.store.add(new Role({name:'condotierre',color:'red',image:'/res/condotierre.png'}),rolesfolder)
-            this.eventQueue.add('gamestart',null)
+            this.input.add('gamestart',null)
         })
 
-        this.eventQueue.listen('playerjoin', (e) => {
+        this.input.listen('playerjoin', (e) => {
             var playerfolder = this.helper.getGame().childByName('players')
             var player = this.store.add(new Player({name:e.name}),playerfolder)
             this.store.add(new Entity({name:'hand'}),player)
             this.store.add(new Entity({name:'board'}),player)
         })
         
-        this.eventQueue.listen('gamestart',() => {
+        this.input.listen('gamestart',() => {
             //generate deck
             
 
@@ -117,10 +118,10 @@ export class GameManager{
             game.status = 'started'
             game.roleturnid = roles.first().id
             game.flag()
-            this.eventQueue.add('roundstart',{})
+            this.input.add('roundstart',{})
         })
 
-        this.eventQueue.listen('roundstart', (e) => {
+        this.input.listen('roundstart', (e) => {
             var players = this.helper.getPlayers()
             var charttable = {
                 2:0,
@@ -188,10 +189,10 @@ export class GameManager{
                 player.specialUsed = false
             }
             var rolestoPick = this.helper.getRoles()
-            this.eventQueue.add('rolepick',{player:this.helper.getPlayers().first(),roles:rolestoPick})
+            this.input.add('rolepick',{player:this.helper.getPlayers().first(),roles:rolestoPick})
         })
 
-        this.eventQueue.listen('rolepick', (e) => {
+        this.input.listen('rolepick', (e) => {
             var players = this.helper.getPlayers()
 
             this.discoverRole(e.player,e.roles,(index) => {
@@ -199,14 +200,14 @@ export class GameManager{
 
                 if(e.roles.length > 0){
                     var nextplayer = players[(players.findIndex(p => p.id == e.player.id) + 1) % players.length]
-                    this.eventQueue.add('rolepick',{player:nextplayer,roles:e.roles})
+                    this.input.add('rolepick',{player:nextplayer,roles:e.roles})
                 }else{
-                    this.eventQueue.add('roleturn', this.helper.getRoles().first().id)
+                    this.input.add('roleturn', this.helper.getRoles().first().id)
                 }
             })
         })
 
-        this.eventQueue.listen('roleturn', (e) => {
+        this.input.listen('roleturn', (e) => {
             var game = this.helper.getGame()
             var role = this.store.get(game.roleturnid) as Role
             if(role.player == null || game.murderedRoleid == role.id){
@@ -231,15 +232,15 @@ export class GameManager{
         })
 
 
-        this.eventQueue.addRule('specialability','not your turn',() => {
+        this.input.addRule('specialability','not your turn',() => {
             return false
         })
 
-        this.eventQueue.addRule('specialability','ability already used',() => {
+        this.input.addRule('specialability','ability already used',() => {
             return false
         })
 
-        this.eventQueue.listen('specialability', (e) => {
+        this.input.listen('specialability', (e) => {
             var game = this.helper.getGame()
             var role = this.store.get(game.roleturnid) as Role
             var player = this.store.get(role.player) as Player
@@ -306,19 +307,19 @@ export class GameManager{
 
         })
 
-        this.eventQueue.addRule('build','not your turn',() => {
+        this.input.addRule('build','not your turn',() => {
             return false
         })
 
-        this.eventQueue.addRule('build','not enough money',() => {
+        this.input.addRule('build','not enough money',() => {
             return false
         })
 
-        this.eventQueue.addRule('build','not enough buildactions',() => {
+        this.input.addRule('build','not enough buildactions',() => {
             return false
         })
 
-        this.eventQueue.listen('build', (e) => {
+        this.input.listen('build', (e) => {
             var player = this.helper.getCurrentPlayer() as Player
             player.buildactions--
             var card = this.store.get(e.card) as Card
@@ -327,11 +328,11 @@ export class GameManager{
             player.flag()
         })
         
-        this.eventQueue.listen('pass',() => {
+        this.input.listen('pass',() => {
             this.incrementRoleTurn()
         })
 
-        this.eventQueue.listen('gamewon',() => {
+        this.input.listen('gamewon',() => {
             var game = this.helper.getGame()
             game.status = 'finished'
 
@@ -339,13 +340,13 @@ export class GameManager{
             //set game to won
         })
 
-        this.eventQueue.listen('debugfinishgame',() => {
+        this.input.listen('debugfinishgame',() => {
             var game = this.helper.getGame()
             game.status = 'finished'
             //set game to won
         })
 
-        this.eventQueue.listen('requestfullupdate',(data) => {
+        this.input.listen('requestfullupdate',(data) => {
             //fullupdate
         })
     }
@@ -379,11 +380,11 @@ export class GameManager{
                 game.status = 'finished'
                 game.flag()
             }else{
-                this.eventQueue.add('roundstart',{})
+                this.input.add('roundstart',{})
             }
         }else{
             game.roleturnid = roles[nextroleindex].id
-            this.eventQueue.add('roleturn',{})
+            this.input.add('roleturn',{})
         }
         
 
@@ -446,7 +447,7 @@ export class GameManager{
         player.discovermin = min
         player.discovermax = max
         this.store.flag(player.id)
-        this.eventQueue.startDiscovery('discover',options,cb)
+        this.input.startDiscovery('discover',options,cb)
     }
 
     
