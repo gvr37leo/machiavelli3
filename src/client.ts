@@ -51,6 +51,10 @@ export class Client{
 
     }
 
+    connectSpoofSocket(socket){
+        
+    }
+
     input(type,data){
         if(type == 'deltaupdate'){
             //check version number

@@ -5,24 +5,10 @@ import {RNG, shuffle} from '../libs/utils/utils'
 import {genDB, generateCards} from './generateDB'
 import { Card, DiscoverOption, Game, Player, Role } from './models'
 import {Helper} from './helper'
-/*
-game
-    setup db
-    ga door rondes heen totdat minstens 1 iemand 8 of meer gebouwen heeft
-
-
-
-
-
-
-gameend
-    bereken scores
-
-*/
 
 export class GameManager{
 
-    db = new EntityStore()
+    store = new EntityStore()
     eventQueue = new EventQueue()
     broadcastEvent = new EventSystem<{type:string,data}>()
     sendEvent = new EventSystem<{sessionid:number,type:string,data}>()
@@ -41,38 +27,38 @@ export class GameManager{
         })
 
         this.eventQueue.listen('init',() => {
-            this.db = new EntityStore()
-            this.helper = new Helper(this.db)
-            var game = this.db.add(new Game({name:'gameroot'}),null)
+            this.store = new EntityStore()
+            this.helper = new Helper(this.store)
+            var game = this.store.add(new Game({name:'gameroot'}),null)
             this.gameroot = game
-            var rolesfolder = this.db.add(new Entity({name:'rolesfolder'}),game)
-            var playerfolder = this.db.add(new Entity({name:'playerfolder'}),game)
-            var deck = this.db.add(new Entity({name:'deck'}),game)
-            var discardpile = this.db.add(new Entity({name:'discardpile'}),game)
+            var rolesfolder = this.store.add(new Entity({name:'rolesfolder'}),game)
+            var playerfolder = this.store.add(new Entity({name:'playerfolder'}),game)
+            var deck = this.store.add(new Entity({name:'deck'}),game)
+            var discardpile = this.store.add(new Entity({name:'discardpile'}),game)
         
-            var moordenaar = this.db.add(new Role({name:'moordenaar',color:'white',image:'/res/moordenaar.png'}),rolesfolder)
-            var dief = this.db.add(new Role({name:'dief',color:'white',image:'/res/dief.png'}),rolesfolder)
-            var magier = this.db.add(new Role({name:'magier',color:'white',image:'/res/magier.png'}),rolesfolder)
-            var koning = this.db.add(new Role({name:'koning',color:'yellow',image:'/res/koning.png'}),rolesfolder)
-            var prediker = this.db.add(new Role({name:'prediker',color:'blue',image:'/res/prediker.png'}),rolesfolder)
-            var koopman = this.db.add(new Role({name:'koopman',color:'green',image:'/res/koopman.png'}),rolesfolder)
-            var bouwmeester = this.db.add(new Role({name:'bouwmeester',color:'white',image:'/res/bouwmeester.png'}),rolesfolder)
-            var condotierre = this.db.add(new Role({name:'condotierre',color:'red',image:'/res/condotierre.png'}),rolesfolder)
+            var moordenaar = this.store.add(new Role({name:'moordenaar',color:'white',image:'/res/moordenaar.png'}),rolesfolder)
+            var dief = this.store.add(new Role({name:'dief',color:'white',image:'/res/dief.png'}),rolesfolder)
+            var magier = this.store.add(new Role({name:'magier',color:'white',image:'/res/magier.png'}),rolesfolder)
+            var koning = this.store.add(new Role({name:'koning',color:'yellow',image:'/res/koning.png'}),rolesfolder)
+            var prediker = this.store.add(new Role({name:'prediker',color:'blue',image:'/res/prediker.png'}),rolesfolder)
+            var koopman = this.store.add(new Role({name:'koopman',color:'green',image:'/res/koopman.png'}),rolesfolder)
+            var bouwmeester = this.store.add(new Role({name:'bouwmeester',color:'white',image:'/res/bouwmeester.png'}),rolesfolder)
+            var condotierre = this.store.add(new Role({name:'condotierre',color:'red',image:'/res/condotierre.png'}),rolesfolder)
             this.eventQueue.add('gamestart',null)
         })
 
         this.eventQueue.listen('playerjoin', (e) => {
             var playerfolder = this.helper.getGame().childByName('players')
-            var player = this.db.add(new Player({name:e.name}),playerfolder)
-            this.db.add(new Entity({name:'hand'}),player)
-            this.db.add(new Entity({name:'board'}),player)
+            var player = this.store.add(new Player({name:e.name}),playerfolder)
+            this.store.add(new Entity({name:'hand'}),player)
+            this.store.add(new Entity({name:'board'}),player)
         })
         
         this.eventQueue.listen('gamestart',() => {
             //generate deck
             
 
-            this.gameroot = this.db.list().find(e => e.name == 'gameroot')
+            this.gameroot = this.store.list().find(e => e.name == 'gameroot')
             var deckfolder = this.helper.getDeckFolder()
             deckfolder.removeChildren()
             
@@ -83,33 +69,33 @@ export class GameManager{
             var koopman = rolesfolder.childByName('koopman')
             var condotierre = rolesfolder.childByName('condotierre')
         
-            this.db.add(new Card({cost:3 ,name:'jachtslot',      role:koning.id,         image:'/res/jachtslot.png'}),deck).duplicate(5)
-            this.db.add(new Card({cost:4 ,name:'slot',       role:koning.id,         image:'/res/slot.png'}),deck).duplicate(4)
-            this.db.add(new Card({cost:5 ,name:'paleis',     role:koning.id,         image:'/res/paleis.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:1 ,name:'tempel',     role:prediker.id,         image:'/res/tempel.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:2 ,name:'kerk',       role:prediker.id,         image:'/res/kerk.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:3 ,name:'abdij',      role:prediker.id,         image:'/res/abdij.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:4 ,name:'kathedraal',     role:prediker.id,         image:'/res/kathedraal.png'}),deck).duplicate(2)
-            this.db.add(new Card({cost:1 ,name:'taveerne',       role:koopman.id,         image:'/res/taveerne.png'}),deck).duplicate(5)
-            this.db.add(new Card({cost:2 ,name:'gildehuis',      role:koopman.id,         image:'/res/gildehuis.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:2 ,name:'markt',      role:koopman.id,         image:'/res/markt.png'}),deck).duplicate(4)
-            this.db.add(new Card({cost:3 ,name:'handelshuis',        role:koopman.id,         image:'/res/handelshuis.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:4 ,name:'haven',      role:koopman.id,         image:'/res/haven.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:5 ,name:'raadhuis',       role:koopman.id,         image:'/res/raadhuis.png'}),deck).duplicate(2)
-            this.db.add(new Card({cost:1 ,name:'wachttoren',     role:condotierre.id,         image:'/res/wachttoren.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:2 ,name:'kerker',     role:condotierre.id,         image:'/res/kerker.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:3 ,name:'toernooiveld',       role:condotierre.id,         image:'/res/toernooiveld.png'}),deck).duplicate(3)
-            this.db.add(new Card({cost:5 ,name:'vesting',        role:condotierre.id,         image:'/res/vesting.png'}),deck).duplicate(2)
-            this.db.add(new Card({cost:2 ,name:'hof_der_wonderen',       role:null,         image:'/res/hofderwonderen.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:3 ,name:'verdedigingstoren',      role:null,         image:'/res/verdedigingstoren.png'}),deck).duplicate(2)
-            this.db.add(new Card({cost:5 ,name:'laboratorium',       role:null,         image:'/res/laboratorium.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:5 ,name:'smederij',       role:null,         image:'/res/smederij.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:5 ,name:'observatorium',      role:null,         image:'/res/observatorium.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:5 ,name:'kerkhof',        role:null,         image:'/res/kerkhof.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:6 ,name:'bibliotheek',        role:null,         image:'/res/bibliotheek.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:6 ,name:'school_voor_magiers',        role:null,         image:'/res/schoolvoormagiers.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:6 ,name:'drakenburcht',       role:null,         image:'/res/drakenburcht.png'}),deck).duplicate(1)
-            this.db.add(new Card({cost:6 ,name:'universiteit',       role:null,         image:'/res/universiteit.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:3 ,name:'jachtslot',      role:koning.id,         image:'/res/jachtslot.png'}),deck).duplicate(5)
+            this.store.add(new Card({cost:4 ,name:'slot',       role:koning.id,         image:'/res/slot.png'}),deck).duplicate(4)
+            this.store.add(new Card({cost:5 ,name:'paleis',     role:koning.id,         image:'/res/paleis.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:1 ,name:'tempel',     role:prediker.id,         image:'/res/tempel.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:2 ,name:'kerk',       role:prediker.id,         image:'/res/kerk.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:3 ,name:'abdij',      role:prediker.id,         image:'/res/abdij.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:4 ,name:'kathedraal',     role:prediker.id,         image:'/res/kathedraal.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:1 ,name:'taveerne',       role:koopman.id,         image:'/res/taveerne.png'}),deck).duplicate(5)
+            this.store.add(new Card({cost:2 ,name:'gildehuis',      role:koopman.id,         image:'/res/gildehuis.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:2 ,name:'markt',      role:koopman.id,         image:'/res/markt.png'}),deck).duplicate(4)
+            this.store.add(new Card({cost:3 ,name:'handelshuis',        role:koopman.id,         image:'/res/handelshuis.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:4 ,name:'haven',      role:koopman.id,         image:'/res/haven.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:5 ,name:'raadhuis',       role:koopman.id,         image:'/res/raadhuis.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:1 ,name:'wachttoren',     role:condotierre.id,         image:'/res/wachttoren.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:2 ,name:'kerker',     role:condotierre.id,         image:'/res/kerker.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:3 ,name:'toernooiveld',       role:condotierre.id,         image:'/res/toernooiveld.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:5 ,name:'vesting',        role:condotierre.id,         image:'/res/vesting.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:2 ,name:'hof_der_wonderen',       role:null,         image:'/res/hofderwonderen.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:3 ,name:'verdedigingstoren',      role:null,         image:'/res/verdedigingstoren.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:5 ,name:'laboratorium',       role:null,         image:'/res/laboratorium.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:5 ,name:'smederij',       role:null,         image:'/res/smederij.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:5 ,name:'observatorium',      role:null,         image:'/res/observatorium.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:5 ,name:'kerkhof',        role:null,         image:'/res/kerkhof.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:6 ,name:'bibliotheek',        role:null,         image:'/res/bibliotheek.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:6 ,name:'school_voor_magiers',        role:null,         image:'/res/schoolvoormagiers.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:6 ,name:'drakenburcht',       role:null,         image:'/res/drakenburcht.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:6 ,name:'universiteit',       role:null,         image:'/res/universiteit.png'}),deck).duplicate(1)
 
             shuffle(deckfolder.children,this.rng)
             var roles = this.helper.getRoles()
@@ -222,11 +208,11 @@ export class GameManager{
 
         this.eventQueue.listen('roleturn', (e) => {
             var game = this.helper.getGame()
-            var role = this.db.get(game.roleturnid) as Role
+            var role = this.store.get(game.roleturnid) as Role
             if(role.player == null || game.murderedRoleid == role.id){
                 this.incrementRoleTurn()
             }else{
-                var player = this.db.get(role.player) as Player
+                var player = this.store.get(role.player) as Player
                 player.buildactions = 1
 
                 this.discover(player,[new DiscoverOption({description:'money'}),new DiscoverOption({description:'cards'})],(e) => {
@@ -255,8 +241,8 @@ export class GameManager{
 
         this.eventQueue.listen('specialability', (e) => {
             var game = this.helper.getGame()
-            var role = this.db.get(game.roleturnid) as Role
-            var player = this.db.get(role.player) as Player
+            var role = this.store.get(game.roleturnid) as Role
+            var player = this.store.get(role.player) as Player
             
 
             if(role.name == 'moordenaar'){
@@ -307,7 +293,7 @@ export class GameManager{
             }else if(role.name == 'condotierre'){
                 this.processTaxes(role)
 
-                var players = this.helper.getRoles().filter(r => r.name != 'prediker').map(r => this.db.get(r.player)) as Player[]
+                var players = this.helper.getRoles().filter(r => r.name != 'prediker').map(r => this.store.get(r.player)) as Player[]
                 this.discoverPlayer(player,players,(i) => {
                     var board = players[i].childByName('board')._children() as Card[]
                     this.discoverCard(player,board,(i) => {
@@ -335,7 +321,7 @@ export class GameManager{
         this.eventQueue.listen('build', (e) => {
             var player = this.helper.getCurrentPlayer() as Player
             player.buildactions--
-            var card = this.db.get(e.card) as Card
+            var card = this.store.get(e.card) as Card
             card.setParent(player.childByName('board'))
             player.money -= card.cost
             player.flag()
@@ -369,7 +355,7 @@ export class GameManager{
         var deckfolder = this.helper.getDeckFolder()
         for(var i = 0; i < 10;i++){
             if(deckfolder.children.length > 0){
-                var topcard = this.db.get(deckfolder.children[0])
+                var topcard = this.store.get(deckfolder.children[0])
                 var hand = player.childByName('hand')
                 topcard.setParent(hand)
             }else{
@@ -429,7 +415,7 @@ export class GameManager{
     }
 
     processTaxes(role:Role){
-        var player = this.db.get(role.player) as Player
+        var player = this.store.get(role.player) as Player
         player.money += player.childByName('board')._children().filter((c:any) => c.role == role.id).length
         player.flag()
     }
@@ -459,7 +445,7 @@ export class GameManager{
         player.discoverOptions = options
         player.discovermin = min
         player.discovermax = max
-        this.db.flag(player.id)
+        this.store.flag(player.id)
         this.eventQueue.startDiscovery('discover',options,cb)
     }
 

@@ -7,13 +7,12 @@ import { StartScreen } from "./startscreen"
 
 var shown = false
 
-export function MainApp(props:{client:Client}){
-    var client = props.client
-    var game = props.client.helper.getGame()
-    var players = props.client.helper.getPlayers()
-    var sessionplayer = props.client.helper.getSessionPlayer(props.client.sessionid)
-    var discardpile = props.client.helper.getDiscardPile()
-    var deck = props.client.helper.getDeckFolder()
+export function MainApp({client}:{client:Client}){
+    var game = client.helper.getGame()
+    var players = client.helper.getPlayers()
+    var sessionplayer = client.helper.getSessionPlayer(client.sessionid)
+    var discardpile = client.helper.getDiscardPile()
+    var deck = client.helper.getDeckFolder()
 
 
     return (
@@ -21,13 +20,13 @@ export function MainApp(props:{client:Client}){
             {(() => {
                 //check if clientplayer has a name
                 if(sessionplayer.name == ''){
-                    return <StartScreen client={props.client} />
+                    return <StartScreen client={client} />
                 }
                 if(game.status == 'started'){
-                    return <RenderHomepage client={props.client} />
+                    return <RenderHomepage client={client} />
                 }
                 if(game.status == 'finished'){
-                    return <GameWonScreen client={props.client} />
+                    return <GameWonScreen client={client} />
                 }
                 
             })()}
@@ -45,27 +44,27 @@ export function MainApp(props:{client:Client}){
                         return <React.Fragment>
                             <div style={{marginBottom:"10px"}}>
                                 <button onClick={() => {
-                                    props.client.output.trigger({type:'gamestart',data:{}})
+                                    client.output.trigger({type:'gamestart',data:{}})
                                 }}>start new game</button>
                             </div>
                             <div style={{marginBottom:"10px"}}>
                                 <button onClick={() => {
-                                    props.client.output.trigger({type:'debugfinishgame',data:{}})
+                                    client.output.trigger({type:'debugfinishgame',data:{}})
                                 }}>end game</button>
                             </div>
                             <div style={{marginBottom:"10px"}}>
                                 <button onClick={() => {
-                                    props.client.updateHtml()
+                                    client.updateHtml()
                                 }}>rerender</button>
                             </div>
                             <div style={{marginBottom:"10px"}}>
                                 <button onClick={() => {
-                                    props.client.output.trigger({type:'requestfullupdate',data:{}})
+                                    client.output.trigger({type:'requestfullupdate',data:{}})
                                 }}>request full update</button>
                             </div>
-                            <div>clientid:{props.client.id}</div>
-                            <div>sessionid:{props.client.sessionid}</div>
-                            <div>dbversion:{props.client.lastprocessedversion}</div>
+                            <div>clientid:{client.id}</div>
+                            <div>sessionid:{client.sessionid}</div>
+                            <div>dbversion:{client.lastprocessedversion}</div>
                         </React.Fragment>
                     }
                 })()}
