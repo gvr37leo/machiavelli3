@@ -5,16 +5,16 @@ import { to } from "./libs/utils/utils"
 
 export class ServerClient{
 
-    input
-    output
+    input = new EventSystem()
+    output = new EventSystem()
     id//sessionid
     //has multiple sockets below
 
     //public
     isSynced//set by user
     versionnumber//set by user
-    disconnected
-    dctimestamp
+    disconnected = false
+    dctimestamp = 0
 
     constructor(){
         
@@ -26,8 +26,8 @@ export class SocketServer{
     input = new EventSystem<{type:string,data:any}>()
     output = new EventSystem<{type:string,data:any}>()
 
-    clients:Store<ServerClient>
-    sockets:Store<IServersideSocket>
+    clients:Store<ServerClient> = new Store()
+    sockets:Store<IServersideSocket> = new Store()
 
     constructor(){
         //todo interval for long disconnected clients
@@ -63,7 +63,7 @@ export class SocketServer{
             client.disconnected = false
             console.log(`user connected:${client.id}`)
             this.output.trigger({type:'clientconnected',data:client})
-            client.input.trigger('finishhandshake',{clientid:client.id, socketid:socket.id})
+            client.input.trigger({type:'finishhandshake',clientid:client.id, socketid:socket.id})
             // this.updateClients()
         })
 
@@ -78,9 +78,8 @@ export class SocketServer{
                 client.disconnected = true
                 client.dctimestamp = Date.now()
 
-                client.input.trigger('disconnect',{clientid:client.id, socketid:socket.id})
                 console.log(`user disconnected:${client.id}`)
-                //set disconnected to true, set dctimestamp to Date.now(),and flag it
+                client.input.trigger({type:'disconnect', clientid:client.id, socketid:socket.id})
                 // this.updateClients()
 
                 
@@ -102,8 +101,8 @@ interface IServersideSocket{
 export class SpoofServersideSocket implements IServersideSocket{
     id: any
     clientid: any
-    input: EventSystem<any>
-    output: EventQueue
+    input = new EventSystem<any>()
+    output = new EventQueue()
 
 }
 
@@ -121,8 +120,8 @@ interface IClientSocket{
 export class ClientSocket implements IClientSocket{
 
 
-    input: any
-    output: any
+    input = new EventSystem<any>()
+    output = new EventSystem<any>()
     sessionid: any
 
     

@@ -45,7 +45,7 @@ hookupserverandgame()
 
 
 
-
+gamemanager.setupListeners()
 gamemanager.input.addAndTrigger('init',{})
 gamemanager.input.addAndTrigger('playerjoin',{name:'aba'})
 gamemanager.input.addAndTrigger('playerjoin',{name:'bob'})
