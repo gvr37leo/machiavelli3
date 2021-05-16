@@ -40,11 +40,11 @@ export class GameManager{
             var koopman = this.store.add(new Role({name:'koopman',color:'green',image:'/res/koopman.png'}),rolesfolder)
             var bouwmeester = this.store.add(new Role({name:'bouwmeester',color:'white',image:'/res/bouwmeester.png'}),rolesfolder)
             var condotierre = this.store.add(new Role({name:'condotierre',color:'red',image:'/res/condotierre.png'}),rolesfolder)
-            this.input.add('gamestart',null)
+            // this.input.add('gamestart',null)
         })
 
         this.input.listen('playerjoin', (e) => {
-            var playerfolder = this.store.getGame().childByName('players')
+            var playerfolder = this.store.getGame().childByName('playerfolder')
             var player = this.store.add(new Player({name:e.name}),playerfolder)
             this.store.add(new Entity({name:'hand'}),player)
             this.store.add(new Entity({name:'board'}),player)
@@ -102,7 +102,7 @@ export class GameManager{
             for(var player of this.store.getPlayers()){
                 player.money = 2
                 player.childByName('board').removeChildren()
-                player.childByName('deck').removeChildren()
+                player.childByName('hand').removeChildren()
                 this.drawCards(player,2)
             }
 
@@ -350,7 +350,7 @@ export class GameManager{
 
     drawCards(player:Player,amount:number){
         var deckfolder = this.store.getDeckFolder()
-        for(var i = 0; i < 10;i++){
+        for(var i = 0; i < amount;i++){
             if(deckfolder.children.length > 0){
                 var topcard = this.store.get(deckfolder.children[0])
                 var hand = player.childByName('hand')

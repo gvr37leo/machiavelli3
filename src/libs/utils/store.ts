@@ -146,7 +146,7 @@ export class EntityStore{
     }
 
     getPlayers():Player[]{
-        return this.getGame().childByName('players')._children() as Player[]
+        return this.getGame().childByName('playerfolder')._children() as Player[]
     }
 
     getDeckFolder():Entity{
@@ -162,7 +162,7 @@ export class EntityStore{
     }
 
     getRoles():Role[]{
-        return this.getGame().childByName('roles')._children() as Role[]
+        return this.getGame().childByName('rolesfolder')._children() as Role[]
     }
 
     getClientPlayer(clientid):Player{
