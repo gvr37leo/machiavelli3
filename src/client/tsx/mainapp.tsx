@@ -8,11 +8,11 @@ import { StartScreen } from "./startscreen"
 var shown = false
 
 export function MainApp({client}:{client:Client}){
-    var game = client.helper.getGame()
-    var players = client.helper.getPlayers()
-    var sessionplayer = client.helper.getSessionPlayer(client.sessionid)
-    var discardpile = client.helper.getDiscardPile()
-    var deck = client.helper.getDeckFolder()
+    var game = client.store.getGame()
+    var players = client.store.getPlayers()
+    var sessionplayer = client.store.getSessionPlayer(client.sessionid)
+    var discardpile = client.store.getDiscardPile()
+    var deck = client.store.getDeckFolder()
 
 
     return (

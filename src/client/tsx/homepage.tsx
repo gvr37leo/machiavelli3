@@ -6,12 +6,12 @@ import { Modal } from "./modal"
 import { RenderPlayer } from "./player"
 
 export function RenderHomepage(props:{client:Client}){
-    var game = props.client.helper.getGame()
-    var players = props.client.helper.getPlayers()
-    var sessionplayer = props.client.helper.getSessionPlayer(props.client.sessionid)
+    var game = props.client.store.getGame()
+    var players = props.client.store.getPlayers()
+    var sessionplayer = props.client.store.getSessionPlayer(props.client.sessionid)
     var boardcards = sessionplayer.childByName('board')._children() as Card[]
     var handcards = sessionplayer.childByName('hand')._children() as Card[]
-    var currentplayer = props.client.helper.getCurrentPlayer()
+    var currentplayer = props.client.store.getCurrentPlayer()
 
     return (
         <React.Fragment>

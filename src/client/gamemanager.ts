@@ -4,7 +4,6 @@ import { Entity, EntityStore } from '../libs/utils/store'
 import {RNG, shuffle} from '../libs/utils/utils'
 import {genDB, generateCards} from './generateDB'
 import { Card, DiscoverOption, Game, Player, Role } from './models'
-import {Helper} from './helper'
 
 export class GameManager{
 
@@ -14,7 +13,6 @@ export class GameManager{
     
     broadcastEvent = new EventSystem<{type:string,data}>()
     rng = new RNG(Math.floor(Math.random() * 100000))
-    helper:Helper
     gameroot: Entity
 
     constructor(){
@@ -29,7 +27,6 @@ export class GameManager{
 
         this.input.listen('init',() => {
             this.store = new EntityStore()
-            this.helper = new Helper(this.store)
             var game = this.store.add(new Game({name:'gameroot'}),null)
             this.gameroot = game
             var rolesfolder = this.store.add(new Entity({name:'rolesfolder'}),game)
@@ -49,7 +46,7 @@ export class GameManager{
         })
 
         this.input.listen('playerjoin', (e) => {
-            var playerfolder = this.helper.getGame().childByName('players')
+            var playerfolder = this.store.getGame().childByName('players')
             var player = this.store.add(new Player({name:e.name}),playerfolder)
             this.store.add(new Entity({name:'hand'}),player)
             this.store.add(new Entity({name:'board'}),player)
@@ -60,7 +57,7 @@ export class GameManager{
             
 
             this.gameroot = this.store.list().find(e => e.name == 'gameroot')
-            var deckfolder = this.helper.getDeckFolder()
+            var deckfolder = this.store.getDeckFolder()
             deckfolder.removeChildren()
             
             var deck = game.childByName('deck')
@@ -99,20 +96,20 @@ export class GameManager{
             this.store.add(new Card({cost:6 ,name:'universiteit',       role:null,         image:'/res/universiteit.png'}),deck).duplicate(1)
 
             shuffle(deckfolder.children,this.rng)
-            var roles = this.helper.getRoles()
+            var roles = this.store.getRoles()
             for(var role of roles){
                 role.player = null
             }
 
-            for(var player of this.helper.getPlayers()){
+            for(var player of this.store.getPlayers()){
                 player.money = 2
                 player.childByName('board').removeChildren()
                 player.childByName('deck').removeChildren()
                 this.drawCards(player,2)
             }
 
-            var game = this.helper.getGame()
-            game.crownwearerid = this.helper.getPlayers().first().id
+            var game = this.store.getGame()
+            game.crownwearerid = this.store.getPlayers().first().id
             game.burgledRoleid = null
             game.murderedRoleid = null
             game.status = 'started'
@@ -122,7 +119,7 @@ export class GameManager{
         })
 
         this.input.listen('roundstart', (e) => {
-            var players = this.helper.getPlayers()
+            var players = this.store.getPlayers()
             var charttable = {
                 2:0,
                 3:0,
@@ -185,15 +182,15 @@ export class GameManager{
 
             }
 
-            for(let player of this.helper.getPlayers()){
+            for(let player of this.store.getPlayers()){
                 player.specialUsed = false
             }
-            var rolestoPick = this.helper.getRoles()
-            this.input.add('rolepick',{player:this.helper.getPlayers().first(),roles:rolestoPick})
+            var rolestoPick = this.store.getRoles()
+            this.input.add('rolepick',{player:this.store.getPlayers().first(),roles:rolestoPick})
         })
 
         this.input.listen('rolepick', (e) => {
-            var players = this.helper.getPlayers()
+            var players = this.store.getPlayers()
 
             this.discoverRole(e.player,e.roles,(index) => {
                 e.roles.remove(index)
@@ -202,13 +199,13 @@ export class GameManager{
                     var nextplayer = players[(players.findIndex(p => p.id == e.player.id) + 1) % players.length]
                     this.input.add('rolepick',{player:nextplayer,roles:e.roles})
                 }else{
-                    this.input.add('roleturn', this.helper.getRoles().first().id)
+                    this.input.add('roleturn', this.store.getRoles().first().id)
                 }
             })
         })
 
         this.input.listen('roleturn', (e) => {
-            var game = this.helper.getGame()
+            var game = this.store.getGame()
             var role = this.store.get(game.roleturnid) as Role
             if(role.player == null || game.murderedRoleid == role.id){
                 this.incrementRoleTurn()
@@ -221,7 +218,7 @@ export class GameManager{
                         player.money += 2
                     }else if(e.data == 'cards'){
 
-                        var top2 = this.helper.getDeckFolder()._children().slice(0,2) as Card[]
+                        var top2 = this.store.getDeckFolder()._children().slice(0,2) as Card[]
                         this.discoverCard(player,top2,(e) => {
                             var hand = player.childByName('hand')
                             top2[e].setParent(hand)
@@ -241,18 +238,18 @@ export class GameManager{
         })
 
         this.input.listen('specialability', (e) => {
-            var game = this.helper.getGame()
+            var game = this.store.getGame()
             var role = this.store.get(game.roleturnid) as Role
             var player = this.store.get(role.player) as Player
             
 
             if(role.name == 'moordenaar'){
-                var roles = this.helper.getRoles().slice(1)
+                var roles = this.store.getRoles().slice(1)
                 this.discoverRole(player,roles,(i) => {
                     game.murderedRoleid = roles[i].id
                 })
             }else if(role.name == 'dief'){
-                var roles = this.helper.getRoles().slice(2)
+                var roles = this.store.getRoles().slice(2)
                 this.discoverRole(player,roles,(i) => {
                     game.burgledRoleid = roles[i].id
                 })
@@ -262,13 +259,13 @@ export class GameManager{
                     new DiscoverOption({description:'swapdeck',image:'',value:'swapdeck'})
                 ],(i,val) => {
                     if(val == 'swapplayer'){
-                        var otherplayers = this.helper.getPlayers().filter(p => p.id != player.id)
+                        var otherplayers = this.store.getPlayers().filter(p => p.id != player.id)
                         this.discoverPlayer(player,otherplayers,(i) => {
                             player.childByName('hand').setParent(otherplayers[i])
                             otherplayers[i].childByName('hand').setParent(player)
                         })
                     }else if(val == 'swapdeck'){
-                        var discardfolder = this.helper.getDiscardFolder()
+                        var discardfolder = this.store.getDiscardFolder()
                         var handcards = player.childByName('hand')._children() as Card[]
                         this.discoverMultipleCards(player,handcards,0,handcards.length,(chosenindices) => {
                             chosenindices.map(index => handcards[index]).forEach(c => c.setParent(discardfolder))
@@ -294,7 +291,7 @@ export class GameManager{
             }else if(role.name == 'condotierre'){
                 this.processTaxes(role)
 
-                var players = this.helper.getRoles().filter(r => r.name != 'prediker').map(r => this.store.get(r.player)) as Player[]
+                var players = this.store.getRoles().filter(r => r.name != 'prediker').map(r => this.store.get(r.player)) as Player[]
                 this.discoverPlayer(player,players,(i) => {
                     var board = players[i].childByName('board')._children() as Card[]
                     this.discoverCard(player,board,(i) => {
@@ -320,7 +317,7 @@ export class GameManager{
         })
 
         this.input.listen('build', (e) => {
-            var player = this.helper.getCurrentPlayer() as Player
+            var player = this.store.getCurrentPlayer() as Player
             player.buildactions--
             var card = this.store.get(e.card) as Card
             card.setParent(player.childByName('board'))
@@ -333,7 +330,7 @@ export class GameManager{
         })
 
         this.input.listen('gamewon',() => {
-            var game = this.helper.getGame()
+            var game = this.store.getGame()
             game.status = 'finished'
 
             //determine winner
@@ -341,7 +338,7 @@ export class GameManager{
         })
 
         this.input.listen('debugfinishgame',() => {
-            var game = this.helper.getGame()
+            var game = this.store.getGame()
             game.status = 'finished'
             //set game to won
         })
@@ -353,7 +350,7 @@ export class GameManager{
 
 
     drawCards(player:Player,amount:number){
-        var deckfolder = this.helper.getDeckFolder()
+        var deckfolder = this.store.getDeckFolder()
         for(var i = 0; i < 10;i++){
             if(deckfolder.children.length > 0){
                 var topcard = this.store.get(deckfolder.children[0])
@@ -366,15 +363,15 @@ export class GameManager{
     }
 
     incrementRoleTurn(){
-        var game = this.helper.getGame()
-        var roles = this.helper.getRoles()
+        var game = this.store.getGame()
+        var roles = this.store.getRoles()
 
         var nextroleindex = roles.findIndex(r => r.id == game.roleturnid) + 1
         if(nextroleindex >= roles.length){
             //check for winner
             if(this.isGameOver()){
                 this.calculatePlayerScores()
-                var scoresortedplayers = this.helper.getPlayers().sort((a,b) => a.score - b.score)
+                var scoresortedplayers = this.store.getPlayers().sort((a,b) => a.score - b.score)
                 var winner = scoresortedplayers.last()
                 game.winnerid = winner.id
                 game.status = 'finished'
@@ -392,16 +389,16 @@ export class GameManager{
     }
 
     isGameOver() {
-        return this.helper.getPlayers().some(p => p.childByName('board').children.length >= 8) 
+        return this.store.getPlayers().some(p => p.childByName('board').children.length >= 8) 
     }
 
     calculatePlayerScores() {
-        for(var player of this.helper.getPlayers()){
+        for(var player of this.store.getPlayers()){
             var buildings = player.childByName('board')._children() as Card[]
             var buildingscore = buildings.reduce((p,c) => p + c.points,0)
             var finishscore = 0
             if(buildings.length >= 8){
-                if(this.helper.getGame().firstFinishedPlayer == player.id){
+                if(this.store.getGame().firstFinishedPlayer == player.id){
                     finishscore = 4
                 }else{
                     finishscore = 2
@@ -450,7 +447,28 @@ export class GameManager{
         this.input.startDiscovery('discover',options,cb)
     }
 
-    
+    updateClients(){
+        
+        
+        
+        // for(var client of this.clients.list()){
+        //     if(client.isSynced){
+        //         var changes = this.gamemanager.entityStore.collectChanges()
+        //         if(changes.deletions.length > 0 || changes.upserts.length > 0){
+        //             client.input('deltaupdate',changes)
+        //             console.log('deltaupdate',{client})
+        //         }
+        //     }else{
+        //         client.isSynced = true
+        //         console.log('fullupdate',{client})
+        //         var fulldb = this.gamemanager.entityStore.list()
+        //         client.input('update',{
+        //             version:this.gamemanager.entityStore.versionnumber,
+        //             data:fulldb
+        //         })
+        //     }
+        // }
+    }
 
 }
 
