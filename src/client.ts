@@ -1,88 +1,72 @@
-import {EventSystem} from './libs/event/eventsystem'
+import {EventSystem, GenericEvent} from './libs/event/eventsystem'
 import {EntityStore,Entity} from './libs/utils/store'
 import { to } from './libs/utils/utils'
 import {MainApp} from './client/tsx/mainapp'
 import { EventQueue } from './libs/event/eventqueue'
+import { ClientSocket, IClientSocket, SocketServer } from './spoofs'
 
 declare var toastr
 
 export class Client{
 
     root:JSX.Element
-    output = new EventSystem<{type,data}>()
-    input = new EventQueue()
-    store:EntityStore
-    id = null
-    sessionid = null
+    output = new GenericEvent()
+    input = new GenericEvent()
+    store:EntityStore = new EntityStore()
+    socketid = null
+    clientid = null
     lastprocessedversion = null
 
     // <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
-    socket: any//socket.io socket
+    socket: IClientSocket//socket.io socket
 
 
     constructor(){
-        this.input.listen('deltaupdate',(data) => {
+        this.input.on('deltaupdate',(data) => {
             //check version number
             console.log('delta update')
             this.store.applyChanges(data.deletions,data.upserts)
             if(to(this.lastprocessedversion,data.version) >= 2){
-                this.output.trigger({type:'requestfullupdate',data:{}})
+                this.output.emit('requestfullupdate',{})
                 console.log(`request full update ${this.lastprocessedversion} -> ${data.version}`)
             }
             this.lastprocessedversion = data.version
             this.updateHtml()
         })
 
-        this.input.listen('update',(data) => {
+        this.input.on('update',(data) => {
             console.log('full update')
             this.lastprocessedversion = data.version
             this.store = this.deserialize(data.data)
             this.updateHtml()
         })
 
-        this.input.listen('turnstart',(data) => {
-            var selfplayer = this.store.getClientPlayer(this.id)
+        this.input.on('turnstart',(data) => {
+            var selfplayer = this.store.getClientPlayer(this.socketid)
             if(selfplayer.id == data){
                 navigator.vibrate(500)
                 toastr.success('your turn')
             }
         })
 
-        this.input.listen('error',(data) => {
+        this.input.on('error',(data) => {
             toastr.error(data)
         })
 
     }
 
-    // connectSocket(socket){
-    //     this.socket = socket
-
-    //     this.output.listen((val) => {
-    //         socket.emit('message',val)
-    //     })
-    //     socket.on('message',(message) => {
-    //         this.input(message.type,message.data)
-    //     })
-
-    //     socket.on('connect',() => {
-    //         console.log('connected')
-    //         socket.emit('handshake',{sessionid:parseInt(sessionStorage.getItem('sessionid'))},({ sessionid, clientid }) => {
-    //             sessionStorage.setItem('sessionid',sessionid)
-    //             this.sessionid = sessionid
-    //             this.id = clientid
-    //         })
-    //     })
-
-    //     socket.on('disconnect',() => {
-    //         console.log('disconnected');
-    //     })
-
-    //     socket.open()
-
-    // }
-
-    connectSpoofSocket(socket){
+    //connect client with clientsocket and then clientsocket to server/serversocket
+    connect(socketserver:SocketServer){
+        this.socket = new ClientSocket()
+        this.input.onany((data,type) => {
+            this.socket.input.emit(type,data)
+        })
         
+        this.socket.output.onany((data,type) => {
+            this.output.emit(type,data)
+        })
+
+        this.socket.connect(socketserver)
     }
 
 

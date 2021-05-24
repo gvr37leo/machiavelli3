@@ -82,7 +82,9 @@ export class EntityStore{
     duplicate(ent:Entity,amount:number):Entity[]{
         var res = []
         for(var i = 0; i < amount;i++){
-            var obj = this.add(Object.assign({},ent),ent._parent())    
+            var copy = Object.assign({},ent) as any
+            copy.__proto__ = (ent as any).__proto__
+            var obj = this.add(copy,ent._parent())    
             res.push(obj)
         }
         return res

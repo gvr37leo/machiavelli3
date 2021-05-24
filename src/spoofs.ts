@@ -1,12 +1,13 @@
 import { EventQueue } from "./libs/event/eventqueue"
-import { EventSystem } from "./libs/event/eventsystem"
+import { EventSystem, GenericEvent } from "./libs/event/eventsystem"
 import { Store } from './libs/utils/store'
 import { to } from "./libs/utils/utils"
 
 export class ServerClient{
 
-    input = new EventSystem()
-    output = new EventSystem()
+    input = new GenericEvent()
+    output = new GenericEvent()
+    specials = new GenericEvent()
     id//sessionid
     //has multiple sockets below
 
@@ -23,8 +24,9 @@ export class ServerClient{
 
 export class SocketServer{
 
-    input = new EventSystem<{type:string,data:any}>()
-    output = new EventSystem<{type:string,data:any}>()
+    input = new GenericEvent()
+    output = new GenericEvent()
+    specials = new GenericEvent()
 
     clients:Store<ServerClient> = new Store()
     sockets:Store<IServersideSocket> = new Store()
@@ -37,37 +39,56 @@ export class SocketServer{
             var longdcedclients = this.clients.list().filter(c => to(c.dctimestamp, Date.now()) > 5000)
             for(var client of longdcedclients){
                 this.clients.remove(client.id)
-                this.output.trigger({type:'clientremoved',data:client})
+                this.specials.emit('clientremoved',client)
             }
         }, 6000);
+
+        // this.input.onany((data,type) => {
+        //     //goes to game/consumer
+        // })
+
+        this.output.onany((data,type) => {
+            this.clients.list().forEach((sc) => sc.output.emit(type,data))
+        })
     }
 
 
     connect(socket:IServersideSocket){
 
         this.sockets.add(socket)
+
         
 
-        socket.output.listen('handshake', (data) => {
+        
+
+        socket.input.on('handshake', (data) => {
             let clientid = data.clientid
             if(clientid == null){
                 clientid = this.clients.counter
             }
-            let client = this.clients.get(clientid)
-            socket.clientid = client.id
-            if(client == null){
-                client = new ServerClient()
-                this.clients.add(client)//dit gaat fout id wordt niet op sessionid gezet todo
-            }
+            let serverclient = this.clients.get(clientid)
+            if(serverclient == null){
+                serverclient = new ServerClient()//serverclients emits should spread and servlients should collect socket emits
+                this.clients.add(serverclient)//dit gaat fout id wordt niet op sessionid gezet todo
+                serverclient.output.onany((data,type) => {
+                    this.sockets.list().filter(s => s.clientid == serverclient.id).forEach(socket => socket.output.emit(type,data))
+                })
 
-            client.disconnected = false
-            console.log(`user connected:${client.id}`)
-            this.output.trigger({type:'clientconnected',data:client})
-            client.input.trigger({type:'finishhandshake',clientid:client.id, socketid:socket.id})
+                serverclient.input.onany((data,type) => {
+                    this.input.emit(type,data)
+                })
+            }
+            socket.clientid = serverclient.id
+            serverclient.disconnected = false
+            console.log(`user connected:${serverclient.id}`)
+            this.specials.emit('clientconnected',serverclient)
+            socket.output.emit('confirmhandshake',{clientid:serverclient.id, socketid:socket.id})
             // this.updateClients()
+
+            //stop bubbling event/consume event
         })
 
-        socket.output.listen('disconnect',() => {
+        socket.specials.on('disconnect',() => {
             //watch out for multiple connected clients
             // this.clients.remove(client.id)
             
@@ -79,11 +100,20 @@ export class SocketServer{
                 client.dctimestamp = Date.now()
 
                 console.log(`user disconnected:${client.id}`)
-                client.input.trigger({type:'disconnect', clientid:client.id, socketid:socket.id})
-                // this.updateClients()
+                client.specials.emit('disconnect', {clientid:client.id, socketid:socket.id})
+                //client removal is done at 5 second interval
+                
+                //consumer should updateClients()
 
                 
             }
+        })
+
+        socket.input.onany((data,type) => {
+            data.socketid = socket.id
+            var serverclient = this.clients.get(socket.clientid)
+            data.clientid = serverclient.id
+            serverclient.input.emit(type,data)
         })
     }
 
@@ -93,43 +123,90 @@ export class SocketServer{
 interface IServersideSocket{
     id
     clientid
-    input:EventSystem<any>
-    output:EventQueue
+    input:GenericEvent
+    output:GenericEvent
+    specials:GenericEvent
+
 
 }
 
 export class SpoofServersideSocket implements IServersideSocket{
     id: any
     clientid: any
-    input = new EventSystem<any>()
-    output = new EventQueue()
-
+    input = new GenericEvent()
+    output = new GenericEvent()
+    specials = new GenericEvent()
 }
 
 
+// ----------------------------------------------------------------------   CLIENT   -------------------------------------------------------------------------------
 
-interface IClientSocket{
+
+export interface IClientSocket{
     input
     output
-    sessionid
+    serverclientid
+    // on(type,data)
+    // emit(type,data)
 
     connect(serverorurl)
-    
 }
 
 export class ClientSocket implements IClientSocket{
 
 
-    input = new EventSystem<any>()
-    output = new EventSystem<any>()
-    sessionid: any
+    id
+    input = new GenericEvent()
+    output = new GenericEvent()
+    specials = new GenericEvent()
 
-    
+    serverclientid: any
+
+    // on(type: any, cb: any) {
+    //     this.input.on(type,cb)
+    // }
+    // emit(type: any, data: any) {
+    //     this.output.emit(type,data)
+    // }
     
     connect(serverorurl: SocketServer) {
-        var socket = new SpoofServersideSocket()
-        serverorurl.connect(socket)
-    }
+        var serversocket = new SpoofServersideSocket()
+        //handshake
 
+        this.input.onany((data,type) => {
+            serversocket.input.emit(type,data)
+        })
+
+        serversocket.output.onany((message,type) => {
+            this.output.emit(type,message)
+        })
+
+        this.specials.on('connect',() => {
+            console.log('connected')
+            var clientid = parseInt(sessionStorage.getItem('clientid'))
+            clientid = isNaN(clientid) ? null : clientid
+            this.input.emit('handshake', {clientid})
+        })
+
+        this.output.on('confirmhandshake',({ clientid,  socketid }) => {
+            sessionStorage.setItem('clientid',clientid)
+            this.serverclientid = clientid
+            this.id = socketid
+        })
+
+        this.specials.on('disconnect',() => {
+            console.log('disconnected');
+        })
+
+        
+
+        serverorurl.connect(serversocket)
+
+        
+
+        this.specials.emit('connect',{})
+
+        
+    }
 }
 

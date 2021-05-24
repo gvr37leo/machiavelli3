@@ -4,7 +4,7 @@ import { Player } from '../models'
 
 export function RenderPlayer(props:{player:Player, client:Client, onClick?}){
     var currentplayer = props.client.store.getCurrentPlayer()
-    var sessionplayer = props.client.store.getSessionPlayer(props.client.sessionid)
+    var sessionplayer = props.client.store.getSessionPlayer(props.client.clientid)
     var boardcards = props.player.childByName('board')._children()
     var handcards = props.player.childByName('hand')._children()
     var bordercolor = 'white'

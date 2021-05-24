@@ -10,7 +10,7 @@ var shown = false
 export function MainApp({client}:{client:Client}){
     var game = client.store.getGame()
     var players = client.store.getPlayers()
-    var sessionplayer = client.store.getSessionPlayer(client.sessionid)
+    var sessionplayer = client.store.getSessionPlayer(client.clientid)
     var discardpile = client.store.getDiscardPile()
     var deck = client.store.getDeckFolder()
 
@@ -44,12 +44,12 @@ export function MainApp({client}:{client:Client}){
                         return <React.Fragment>
                             <div style={{marginBottom:"10px"}}>
                                 <button onClick={() => {
-                                    client.output.trigger({type:'gamestart',data:{}})
+                                    client.input.emit('gamestart',{})
                                 }}>start new game</button>
                             </div>
                             <div style={{marginBottom:"10px"}}>
                                 <button onClick={() => {
-                                    client.output.trigger({type:'debugfinishgame',data:{}})
+                                    client.input.emit('debugfinishgame',{})
                                 }}>end game</button>
                             </div>
                             <div style={{marginBottom:"10px"}}>
@@ -59,11 +59,11 @@ export function MainApp({client}:{client:Client}){
                             </div>
                             <div style={{marginBottom:"10px"}}>
                                 <button onClick={() => {
-                                    client.output.trigger({type:'requestfullupdate',data:{}})
+                                    client.input.emit('requestfullupdate',{})
                                 }}>request full update</button>
                             </div>
-                            <div>clientid:{client.id}</div>
-                            <div>sessionid:{client.sessionid}</div>
+                            <div>socketid:{client.socketid}</div>
+                            <div>clientid:{client.clientid}</div>
                             <div>dbversion:{client.lastprocessedversion}</div>
                         </React.Fragment>
                     }

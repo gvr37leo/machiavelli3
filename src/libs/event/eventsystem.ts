@@ -22,3 +22,23 @@ export class EventSystem<T>{
         }
     }
 }
+
+export class GenericEvent{
+
+    idcounter = 0
+    listeners:{id:number,type:string, cb: (data: any,type:string) => void; }[] = []
+
+    on(type,cb: (data: any,type:string) => void){
+        var id = this.idcounter++
+        this.listeners.push({id,cb,type})
+        return id
+    }
+
+    emit(type,data){
+        this.listeners.filter(l => l.type == type || l.type == 'any').forEach(l => l.cb(data,type))
+    }
+
+    onany(cb: (data: any,type:string) => void){
+        this.on('any',cb)
+    }
+}

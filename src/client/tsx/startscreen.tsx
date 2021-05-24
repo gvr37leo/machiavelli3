@@ -7,7 +7,7 @@ export function StartScreen(props:{client:Client}){
             <input placeholder="Name" id="name" style={{marginRight:"20px", padding:"10px"}}/>
             <button style={{padding:"10px 20px"}} onClick={() => {
                 var name = (document.querySelector('#name') as HTMLInputElement).value
-                props.client.output.trigger({type:'playerjoin',data:{name:name}})
+                props.client.output.emit('playerjoin',{name:name})
             }}>join</button>
         </div>
     </div>

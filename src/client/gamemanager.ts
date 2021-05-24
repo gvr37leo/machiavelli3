@@ -1,5 +1,5 @@
 import {EventQueue} from '../libs/event/eventqueue'
-import {EventSystem} from '../libs/event/eventsystem'
+import {EventSystem, GenericEvent} from '../libs/event/eventsystem'
 import { Entity, EntityStore } from '../libs/utils/store'
 import {RNG, shuffle} from '../libs/utils/utils'
 import {genDB, generateCards} from './generateDB'
@@ -9,7 +9,7 @@ export class GameManager{
 
     store = new EntityStore()
     input = new EventQueue()
-    output = new EventSystem<{sessionid:number,type:string,data}>()
+    output = new GenericEvent()
     
     broadcastEvent = new EventSystem<{type:string,data}>()
     rng = new RNG(Math.floor(Math.random() * 100000))
@@ -21,7 +21,7 @@ export class GameManager{
     setupListeners(){
 
         this.input.onRuleBroken.listen(e => {
-            this.output.trigger({type:'error',sessionid:e.event.data.sessionid,data:e.error})
+            this.output.emit('error',{sessionid:e.event.data.sessionid,data:e.error})
         })
 
         this.input.listen('init',() => {

@@ -8,7 +8,7 @@ import { RenderPlayer } from "./player"
 export function RenderHomepage(props:{client:Client}){
     var game = props.client.store.getGame()
     var players = props.client.store.getPlayers()
-    var sessionplayer = props.client.store.getSessionPlayer(props.client.sessionid)
+    var sessionplayer = props.client.store.getSessionPlayer(props.client.clientid)
     var boardcards = sessionplayer.childByName('board')._children() as Card[]
     var handcards = sessionplayer.childByName('hand')._children() as Card[]
     var currentplayer = props.client.store.getCurrentPlayer()
@@ -24,11 +24,11 @@ export function RenderHomepage(props:{client:Client}){
                     </div>
                     <div style={{flexGrow:1,display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:"center"}}>
                         <div style={{cursor:'pointer', border:'1px solid white', margin:'40px', padding:'10px'}} onClick={() => {
-                            props.client.output.trigger({type:'specialability',data:null})
+                            props.client.input.emit('specialability',null)
                         }}>special</div>
 
                         <div style={{cursor:'pointer', border:'1px solid white', margin:'40px', padding:'10px'}} onClick={() => {
-                            props.client.output.trigger({type:'pass',data:null})
+                            props.client.input.emit('pass',null)
                         }}>pass</div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@ export function RenderHomepage(props:{client:Client}){
                 </div>
                 <div style={{display:"flex", justifyContent:"center", flexWrap:"wrap", overflow:"auto", margin:"20px", border:"1px solid white"}}>
                     {handcards.map((c:Card) => <CardView onClick={() => {
-                        props.client.output.trigger({type:'playcard',data:c.id})
+                        props.client.input.emit('playcard',{id:c.id})
                     }} key={c.id} card={c} />)}
                 </div>
             </div>
@@ -50,7 +50,7 @@ export function RenderHomepage(props:{client:Client}){
                             {option.description}
                             {option.value}
                             <img key={i} width="180px" style={{cursor:"pointer", margin:"20px"}} src={`./resources/K${option.image}.jpg`}  onClick={() => {
-                                props.client.output.trigger({type:'completediscovery',data:{data:option,id:sessionplayer.discoverid}})
+                                props.client.input.emit('completediscovery',{data:option,id:sessionplayer.discoverid})
                             }}></img>
                         </div>
                     })}
