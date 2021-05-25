@@ -36,8 +36,9 @@ export class SocketServer{
         //emit event for deleted clients so listeners can delete connected players and stuff
 
         setInterval(() => {
-            let longdcedclients = this.clients.list().filter(c => to(c.dctimestamp, Date.now()) > 5000)
+            let longdcedclients = this.clients.list().filter(c => c.disconnected == true && to(c.dctimestamp, Date.now()) > 5000)
             for(let client of longdcedclients){
+                console.log('removed client')
                 this.clients.remove(client.id)
                 this.specials.emit('clientremoved',client)
             }
