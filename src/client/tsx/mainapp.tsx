@@ -19,8 +19,6 @@ export function MainApp({client}:{client:Client}){
         <React.Fragment>
             {(() => {
                 
-                //check if clientplayer has a name
-                console.log(sessionplayer.name == '')
                 if(sessionplayer.name == ''){
                     return <StartScreen client={client} />
                 }

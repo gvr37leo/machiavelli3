@@ -76,7 +76,7 @@ function hookupserverandgame(){
 let client = new Client()
 client.connect(socketserver)
 
-client.socket.input.emit('playerjoin', { name:'aba' })
+// client.socket.input.emit('playerjoin', { name:'aba' })
 // gamemanager.input.addAndTrigger('gamestart',{})
 let appel = document.querySelector('#app');
 ReactDOM.render(client.root,appel)
