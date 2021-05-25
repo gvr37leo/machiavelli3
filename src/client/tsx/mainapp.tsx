@@ -5,20 +5,22 @@ import { RenderHomepage } from "./homepage"
 import { StartScreen } from "./startscreen"
 
 
-var shown = false
+let shown = false
 
 export function MainApp({client}:{client:Client}){
-    var game = client.store.getGame()
-    var players = client.store.getPlayers()
-    var sessionplayer = client.store.getSessionPlayer(client.clientid)
-    var discardpile = client.store.getDiscardPile()
-    var deck = client.store.getDeckFolder()
+    let game = client.store.getGame()
+    let players = client.store.getPlayers()
+    let sessionplayer = client.store.getClientPlayer(client.socket.serverclientid)
+    let discardpile = client.store.getDiscardPile()
+    let deck = client.store.getDeckFolder()
 
 
     return (
         <React.Fragment>
             {(() => {
+                
                 //check if clientplayer has a name
+                console.log(sessionplayer.name == '')
                 if(sessionplayer.name == ''){
                     return <StartScreen client={client} />
                 }
@@ -29,7 +31,7 @@ export function MainApp({client}:{client:Client}){
                     return <GameWonScreen client={client} />
                 }
                 
-            })()}
+            })()} 
             <div style={{position:"absolute", border:"1px solid black", borderRadius:"3px", color:"black", top:"10px", left:"10px", padding:"20px", background:"white"}}>
                 <div>debug panel</div>
                 <div style={{marginBottom:"10px"}}>
@@ -62,8 +64,8 @@ export function MainApp({client}:{client:Client}){
                                     client.input.emit('requestfullupdate',{})
                                 }}>request full update</button>
                             </div>
-                            <div>socketid:{client.socketid}</div>
-                            <div>clientid:{client.clientid}</div>
+                            <div>socketid:{client.socket.id}</div>
+                            <div>clientid:{client.socket.serverclientid}</div>
                             <div>dbversion:{client.lastprocessedversion}</div>
                         </React.Fragment>
                     }

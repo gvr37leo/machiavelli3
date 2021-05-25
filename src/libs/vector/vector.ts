@@ -6,7 +6,7 @@ export class Vector{
     }
 
     map(callback:(arr:number[],i:number) => void){
-        for(var i = 0; i < this.vals.length; i++){
+        for(let i = 0; i < this.vals.length; i++){
             callback(this.vals,i)
         }
         return this
@@ -45,7 +45,7 @@ export class Vector{
     }
 
     length():number{
-        var sum = 0
+        let sum = 0
         this.map((arr,i) => sum += arr[i] * arr[i])
         return Math.pow(sum,0.5)
     }
@@ -71,13 +71,13 @@ export class Vector{
     }
 
     dot(v:Vector):number{
-        var sum = 0
+        let sum = 0
         this.map((arr,i) => sum += arr[i] * v.vals[i])
         return sum
     }
 
     loop(callback: (vector: Vector) => void): void {
-        var counter = this.c()
+        let counter = this.c()
         counter.vals.fill(0)
 
         while(counter.compare(this) == -1){
@@ -89,7 +89,7 @@ export class Vector{
     }
 
     compare(v:Vector):number{
-        for (var i = this.vals.length - 1; i >= 0; i--) {
+        for (let i = this.vals.length - 1; i >= 0; i--) {
 			if (this.vals[i] < v.vals[i]) {
 				continue;
 			}
@@ -104,7 +104,7 @@ export class Vector{
     }
 
     incr(comparedTo: Vector): boolean {
-        for(var i = 0; i < this.vals.length; i++){
+        for(let i = 0; i < this.vals.length; i++){
 			if((this.vals[i] + 1) < comparedTo.vals[i]){
 				this.vals[i]++;
 				return false;
@@ -152,26 +152,26 @@ export class Vector{
     }
 
     draw(ctxt:CanvasRenderingContext2D){
-        var width = 10
-        var halfwidth = width / 2
+        let width = 10
+        let halfwidth = width / 2
         ctxt.fillRect(this.x - halfwidth,this.y - halfwidth,width,width)
     }
     
     cross(v:Vector):Vector{
-        var x = this.y * v.z - this.z * v.y
-        var y = this.z * v.x - this.x * v.z
-        var z = this.x * v.y - this.y * v.x
+        let x = this.y * v.z - this.z * v.y
+        let y = this.z * v.x - this.x * v.z
+        let z = this.x * v.y - this.y * v.x
         return new Vector(x,y,z)
     }
 
     static fromArray(vals:number[]){
-        var x = new Vector()
+        let x = new Vector()
         x.vals = vals
         return x
     }
 
     loop2d(callback: (v: Vector) => void):void{
-        var counter = new Vector(0,0)
+        let counter = new Vector(0,0)
         for(counter.x = 0; counter.x < this.x; counter.x++){
             for(counter.y = 0; counter.y < this.y; counter.y++){
                 callback(counter)
@@ -180,7 +180,7 @@ export class Vector{
     }
 
     loop3d(callback: (v: Vector) => void):void{
-        var counter = new Vector(0,0,0)
+        let counter = new Vector(0,0,0)
         for(counter.x = 0; counter.x < this.x; counter.x++){
             for(counter.y = 0; counter.y < this.y; counter.y++){
                 for(counter.z = 0; counter.z < this.z; counter.z++){

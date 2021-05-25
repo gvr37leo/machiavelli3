@@ -27,13 +27,20 @@ export class EntityStore{
         return item
     }
 
+    inject(item:Entity){
+        item.store = this
+        this.map.set(item.id, item)
+        this.upserts.add(item.id)
+        return item
+    }
+
     list(){
         return Array.from(this.map.values())
     }
 
     remove(id){
-        var ent = this.map.get(id)
-        var parent = this.map.get(ent.parent)
+        let ent = this.map.get(id)
+        let parent = this.map.get(ent.parent)
         remove(parent.children, ent.id)
         this.map.delete(id)
         this.deletions.add(id)
@@ -42,7 +49,7 @@ export class EntityStore{
     }
 
     move(ent:Entity, parent:Entity){
-        var oldparent = this.get(ent.parent)
+        let oldparent = this.get(ent.parent)
         if(oldparent != null){
             remove(oldparent.children,ent.id)
             oldparent.onEvent.addAndTrigger('remove',ent)
@@ -57,7 +64,7 @@ export class EntityStore{
     }
 
     ancestor(ent:Entity,type:string){
-        var current = ent
+        let current = ent
         while(current != null){
             if(current.type == type){
                 return current
@@ -80,11 +87,11 @@ export class EntityStore{
     }
 
     duplicate(ent:Entity,amount:number):Entity[]{
-        var res = []
-        for(var i = 0; i < amount;i++){
-            var copy = Object.assign({},ent) as any
+        let res = []
+        for(let i = 0; i < amount;i++){
+            let copy = Object.assign({},ent) as any
             copy.__proto__ = (ent as any).__proto__
-            var obj = this.add(copy,ent._parent())    
+            let obj = this.add(copy,ent._parent())    
             res.push(obj)
         }
         return res
@@ -96,14 +103,14 @@ export class EntityStore{
     }
 
     collectChanges(){
-        for(var deletion of this.deletions){
+        for(let deletion of this.deletions){
             if(this.upserts.has(deletion)){
                 this.deletions.delete(deletion)
                 this.upserts.delete(deletion)
             }
         }
-        var deletions = Array.from(this.deletions.keys())
-        var upserts = Array.from(this.upserts.entries()).map(e => this.get(e[0]))
+        let deletions = Array.from(this.deletions.keys())
+        let upserts = Array.from(this.upserts.entries()).map(e => this.get(e[0]))
         this.upserts.clear()
         this.deletions.clear()
         if(upserts.length > 0 || deletions.length > 0){
@@ -120,8 +127,8 @@ export class EntityStore{
     }
 
     applyChanges(deletions:number[],upserts:any[]){
-        for(var upsert of upserts){
-            var local = this.get(upsert.id)
+        for(let upsert of upserts){
+            let local = this.get(upsert.id)
             if(local == null){
                 this.insert(upsert,null)
                 upsert.__proto__ = Entity.prototype
@@ -130,15 +137,15 @@ export class EntityStore{
             }
         }
 
-        for(var deletion of deletions){
+        for(let deletion of deletions){
             this.remove(deletion)
         }
     }
 
     getCurrentPlayer(){
-        var game = this.getGame()
-        var activerole = this.getRoles().find(r => r.id == game.roleturnid)
-        var activeplayer = this.get(activerole.player)
+        let game = this.getGame()
+        let activerole = this.getRoles().find(r => r.id == game.roleturnid)
+        let activeplayer = this.get(activerole.player)
         return activeplayer
     }
 
@@ -170,16 +177,12 @@ export class EntityStore{
     getClientPlayer(clientid):Player{
         return this.getPlayers().find(p => p.clientid == clientid)
     }
-
-    getSessionPlayer(sessionid):Player{
-        return this.getPlayers().find(p => p.sessionid == sessionid)
-    }
 }
 
 
 export class Entity{
     id:number
-    name:string
+    name:string = ''
     parent:number
     type:string
     children:number[] = []
@@ -274,21 +277,21 @@ export class Store<T>{
     }
 
     remove(id){
-        var val = this.map.get(id)
+        let val = this.map.get(id)
         this.map.delete(id)
         this.deletions.add(id)
         return val
     }
 
     collectChanges(){
-        for(var deletion of this.deletions){
+        for(let deletion of this.deletions){
             if(this.upserts.has(deletion)){
                 this.deletions.delete(deletion)
                 this.upserts.delete(deletion)
             }
         }
-        var deletions = Array.from(this.deletions.keys())
-        var upserts = Array.from(this.upserts.entries()).map(e => this.get(e[0]))
+        let deletions = Array.from(this.deletions.keys())
+        let upserts = Array.from(this.upserts.entries()).map(e => this.get(e[0]))
         this.upserts.clear()
         this.deletions.clear()
         if(upserts.length > 0 || deletions.length > 0){
@@ -305,8 +308,8 @@ export class Store<T>{
     }
 
     applyChanges(deletions:number[],upserts:any[]){
-        for(var upsert of upserts){
-            var local = this.get(upsert.id)
+        for(let upsert of upserts){
+            let local = this.get(upsert.id)
             if(local == null){
                 this.insert(upsert)
                 upsert.__proto__ = Entity.prototype
@@ -315,7 +318,7 @@ export class Store<T>{
             }
         }
 
-        for(var deletion of deletions){
+        for(let deletion of deletions){
             this.remove(deletion)
         }
     }

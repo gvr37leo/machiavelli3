@@ -3,7 +3,7 @@ export class EventSystem<T>{
     listeners:{id:number, cb: (data: any) => void; }[] = []
 
     listen(cb:(val:T) => void){
-        var listener = {
+        let listener = {
             id:this.idcounter++,
             cb:cb,
         }
@@ -12,12 +12,12 @@ export class EventSystem<T>{
     }
 
     unlisten(id){
-        var index = this.listeners.findIndex(o => o.id == id)
+        let index = this.listeners.findIndex(o => o.id == id)
         this.listeners.splice(index,1)
     }
 
     trigger(val:T){
-        for (var listener of this.listeners) {
+        for (let listener of this.listeners) {
             listener.cb(val)
         }
     }
@@ -29,7 +29,7 @@ export class GenericEvent{
     listeners:{id:number,type:string, cb: (data: any,type:string) => void; }[] = []
 
     on(type,cb: (data: any,type:string) => void){
-        var id = this.idcounter++
+        let id = this.idcounter++
         this.listeners.push({id,cb,type})
         return id
     }

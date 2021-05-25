@@ -13,7 +13,7 @@ class Anim{
     }
 
     get():number{
-        var cycles = this.stopwatch.get() / this.duration
+        let cycles = this.stopwatch.get() / this.duration
 
         switch (this.animType) {
             case AnimType.once:
@@ -22,7 +22,7 @@ class Anim{
                 return lerp(this.begin,this.end,mod(cycles,1))
             case AnimType.pingpong:
                 
-                var pingpongcycle = mod(cycles, 2)
+                let pingpongcycle = mod(cycles, 2)
                 if(pingpongcycle <= 1){
                     return lerp(this.begin,this.end,pingpongcycle)
                 }else{
@@ -30,7 +30,7 @@ class Anim{
                 }
 
             case AnimType.extend:
-                var distPerCycle = to(this.begin,this.end)
+                let distPerCycle = to(this.begin,this.end)
                 return Math.floor(cycles) * distPerCycle + lerp(this.begin,this.end,mod(cycles,1))
         }
     }

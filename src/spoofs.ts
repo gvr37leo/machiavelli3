@@ -36,8 +36,8 @@ export class SocketServer{
         //emit event for deleted clients so listeners can delete connected players and stuff
 
         setInterval(() => {
-            var longdcedclients = this.clients.list().filter(c => to(c.dctimestamp, Date.now()) > 5000)
-            for(var client of longdcedclients){
+            let longdcedclients = this.clients.list().filter(c => to(c.dctimestamp, Date.now()) > 5000)
+            for(let client of longdcedclients){
                 this.clients.remove(client.id)
                 this.specials.emit('clientremoved',client)
             }
@@ -111,7 +111,7 @@ export class SocketServer{
 
         socket.input.onany((data,type) => {
             data.socketid = socket.id
-            var serverclient = this.clients.get(socket.clientid)
+            let serverclient = this.clients.get(socket.clientid)
             data.clientid = serverclient.id
             serverclient.input.emit(type,data)
         })
@@ -143,13 +143,13 @@ export class SpoofServersideSocket implements IServersideSocket{
 
 
 export interface IClientSocket{
-    input
-    output
+    input:GenericEvent
+    output:GenericEvent
+    specials:GenericEvent
+    id
     serverclientid
-    // on(type,data)
-    // emit(type,data)
 
-    connect(serverorurl)
+    connect(serverorurl: SocketServer)
 }
 
 export class ClientSocket implements IClientSocket{
@@ -170,7 +170,7 @@ export class ClientSocket implements IClientSocket{
     // }
     
     connect(serverorurl: SocketServer) {
-        var serversocket = new SpoofServersideSocket()
+        let serversocket = new SpoofServersideSocket()
         //handshake
 
         this.input.onany((data,type) => {
@@ -183,7 +183,7 @@ export class ClientSocket implements IClientSocket{
 
         this.specials.on('connect',() => {
             console.log('connected')
-            var clientid = parseInt(sessionStorage.getItem('clientid'))
+            let clientid = parseInt(sessionStorage.getItem('clientid'))
             clientid = isNaN(clientid) ? null : clientid
             this.input.emit('handshake', {clientid})
         })
@@ -192,6 +192,7 @@ export class ClientSocket implements IClientSocket{
             sessionStorage.setItem('clientid',clientid)
             this.serverclientid = clientid
             this.id = socketid
+            this.specials.emit('confirmhandshake',{})
         })
 
         this.specials.on('disconnect',() => {

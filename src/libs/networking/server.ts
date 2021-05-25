@@ -38,7 +38,7 @@ class Server{
         })
 
         this.gamemanager.broadcastEvent.listen((event) => {
-            for(var client of this.clients.list()){
+            for(let client of this.clients.list()){
                 client.input(event.type,event.data)
             }
         })
@@ -48,7 +48,7 @@ class Server{
         })
 
         setInterval(() => {
-            var longdcedplayers = this.gamemanager.helper.getPlayers().filter(p => p.disconnected == true && (Date.now() - p.dctimestamp) > 5_000 )
+            let longdcedplayers = this.gamemanager.helper.getPlayers().filter(p => p.disconnected == true && (Date.now() - p.dctimestamp) > 5_000 )
             longdcedplayers.forEach(p => {
                 console.log(`removed disconnected player:${p.name}`)
                 p.remove()
@@ -110,14 +110,14 @@ class Server{
         client.socket.on('disconnect',() => {
             //watch out for multiple connected clients
             this.clients.remove(client.id)
-            var sessionplayer = this.gamemanager.helper.getSessionPlayer(client.sessionid)
+            let sessionplayer = this.gamemanager.helper.getSessionPlayer(client.sessionid)
             console.log(`user disconnected:${client.sessionid}`)
             //this often goes wrong for some reason
             //maybe when multiple clients are connected the old player's clientid gets overwritten
             //also goes wrong when a second tab connects and disconnects
             // check if other clients use the same sessionid
             
-            var connectedclients = this.clients.list().filter(c => c.sessionid == client.sessionid)
+            let connectedclients = this.clients.list().filter(c => c.sessionid == client.sessionid)
             if(connectedclients.length == 0){
                 sessionplayer.disconnected = true
                 sessionplayer.dctimestamp = Date.now()

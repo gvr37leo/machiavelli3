@@ -52,7 +52,7 @@ export class EventQueue{
 
 
     listen(type:string,cb:(data:any) => void){
-        var id = this.idcounter++
+        let id = this.idcounter++
         this.listeners.push({
             id:id,
             type: type,
@@ -70,7 +70,7 @@ export class EventQueue{
     }
 
     unlisten(id:number){
-        var index = this.listeners.findIndex(o => o.id == id)
+        let index = this.listeners.findIndex(o => o.id == id)
         this.listeners.splice(index,1)
     }
 

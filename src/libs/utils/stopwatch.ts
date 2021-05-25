@@ -6,7 +6,7 @@ class StopWatch{
     paused = true
 
     get():number{
-        var currentamountpaused = 0
+        let currentamountpaused = 0
         if(this.paused){
             currentamountpaused = to(this.pausetimestamp,Date.now())
         }

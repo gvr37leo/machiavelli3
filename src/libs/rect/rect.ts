@@ -6,7 +6,7 @@ class Rect{
 
     collidePoint(point:Vector){
         
-        for (var i = 0; i < this.min.vals.length; i++) {
+        for (let i = 0; i < this.min.vals.length; i++) {
 			if (!inRange(this.min.vals[i], this.max.vals[i], point.vals[i])) {
 				return false;
 			}
@@ -19,7 +19,7 @@ class Rect{
     }
 
     collideBox(other:Rect){
-        for(var i = 0; i < 2; i++){
+        for(let i = 0; i < 2; i++){
 			if(!rangeOverlap(this.min[i], this.max[i], other.min[i], other.max[i])){
 				return false;
 			}
@@ -33,18 +33,18 @@ class Rect{
     }
 
     draw(ctxt:CanvasRenderingContext2D){
-       var size = this.size()
+       let size = this.size()
        ctxt.fillRect(this.min.x,this.min.y,size.x,size.y)
     }
 
     move(pos:Vector){
-        var size = this.size()
+        let size = this.size()
         this.min = pos
         this.max = this.min.c().add(size)
     }
 
     loop(callback:(v:Vector)=>void){
-        var temp = this.max.c()
+        let temp = this.max.c()
         
 
         this.size().loop(v2 => {

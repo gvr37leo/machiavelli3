@@ -27,7 +27,7 @@ export function genDB(db:EntityStore){
     // createplayer({name:'geke'})
 
     // function createplayer(obj){
-    //     var player = db.add(new Player(obj),playerfolder)
+    //     let player = db.add(new Player(obj),playerfolder)
     //     db.add(new Entity({name:'hand'}),player)
     //     db.add(new Entity({name:'board'}),player)
     // }
@@ -39,6 +39,6 @@ export function genDB(db:EntityStore){
 
 export function generateCards(db:EntityStore){
 
-    var game = db.list().find(e => e.name == 'gameroot')
+    let game = db.list().find(e => e.name == 'gameroot')
 
 }

@@ -1,17 +1,17 @@
 const { series,parallel,src,dest,watch } = require('gulp');
-var del = require('del')
-var ts = require('gulp-typescript')
-var browserify = require("browserify");
-var source = require("vinyl-source-stream");
-var tsify = require("tsify");
-var sourcemaps = require("gulp-sourcemaps");
-var buffer = require("vinyl-buffer");
+let del = require('del')
+let ts = require('gulp-typescript')
+let browserify = require("browserify");
+let source = require("vinyl-source-stream");
+let tsify = require("tsify");
+let sourcemaps = require("gulp-sourcemaps");
+let buffer = require("vinyl-buffer");
 
 // const rollup = require('rollup');
 // const rollupTypescript = require('@rollup/plugin-typescript');
-// var  nodeResolve =  require('@rollup/plugin-node-resolve').nodeResolve
+// let  nodeResolve =  require('@rollup/plugin-node-resolve').nodeResolve
 
-var tsProject = ts.createProject('tsconfig.json',{});
+let tsProject = ts.createProject('tsconfig.json',{});
 
 function clean(cb) {
     del('./dist/**/*').then(() => {
@@ -66,5 +66,5 @@ function livereload(cb) {
   
 exports.transpile = transpile;
 exports.default = function(){
-    watch(['src/*.{ts,tsx}'], { ignoreInitial: false },series(clean, transpile))
+    watch(['src/**/*.{ts,tsx}'], { ignoreInitial: false },series(clean, transpile))
 }

@@ -11,7 +11,7 @@ export class Camera{
 
     begin(){
         this.ctxt.save()
-        var m = this.createMatrixScreen2World().inverse()
+        let m = this.createMatrixScreen2World().inverse()
         this.ctxt.transform(m.a,m.b,m.c,m.d,m.e,m.f)
     }
 
@@ -20,11 +20,11 @@ export class Camera{
     }
 
     createMatrixScreen2World(){
-        var a = new DOMMatrix([
+        let a = new DOMMatrix([
             1,0,0,1,-this.screensize.x / 2,-this.screensize.y / 2
         ])
         
-        var b = new DOMMatrix([
+        let b = new DOMMatrix([
             this.scale.x,0,0,this.scale.y,this.pos.x,this.pos.y
         ])
         
@@ -33,12 +33,12 @@ export class Camera{
     }
 
     screen2world(pos:Vector):Vector{
-        var dompoint = this.createMatrixScreen2World().transformPoint(new DOMPoint(pos.x,pos.y))
+        let dompoint = this.createMatrixScreen2World().transformPoint(new DOMPoint(pos.x,pos.y))
         return new Vector(dompoint.x,dompoint.y)
     }
 
     world2screen(pos:Vector):Vector{
-        var dompoint = this.createMatrixScreen2World().inverse().transformPoint(new DOMPoint(pos.x,pos.y))
+        let dompoint = this.createMatrixScreen2World().inverse().transformPoint(new DOMPoint(pos.x,pos.y))
         return new Vector(dompoint.x,dompoint.y)
     }
 

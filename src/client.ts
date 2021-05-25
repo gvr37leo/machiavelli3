@@ -5,16 +5,15 @@ import {MainApp} from './client/tsx/mainapp'
 import { EventQueue } from './libs/event/eventqueue'
 import { ClientSocket, IClientSocket, SocketServer } from './spoofs'
 
-declare var toastr
+declare let toastr
 
 export class Client{
 
     root:JSX.Element
     output = new GenericEvent()
     input = new GenericEvent()
+    special = new GenericEvent()
     store:EntityStore = new EntityStore()
-    socketid = null
-    clientid = null
     lastprocessedversion = null
 
     // <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
@@ -22,9 +21,8 @@ export class Client{
 
 
     constructor(){
-        this.input.on('deltaupdate',(data) => {
+        this.output.on('deltaupdate',(data) => {
             //check version number
-            console.log('delta update')
             this.store.applyChanges(data.deletions,data.upserts)
             if(to(this.lastprocessedversion,data.version) >= 2){
                 this.output.emit('requestfullupdate',{})
@@ -34,22 +32,21 @@ export class Client{
             this.updateHtml()
         })
 
-        this.input.on('update',(data) => {
-            console.log('full update')
+        this.output.on('update',(data) => {
             this.lastprocessedversion = data.version
             this.store = this.deserialize(data.data)
             this.updateHtml()
         })
 
-        this.input.on('turnstart',(data) => {
-            var selfplayer = this.store.getClientPlayer(this.socketid)
+        this.output.on('turnstart',(data) => {
+            let selfplayer = this.store.getClientPlayer(this.socket.serverclientid)
             if(selfplayer.id == data){
                 navigator.vibrate(500)
                 toastr.success('your turn')
             }
         })
 
-        this.input.on('error',(data) => {
+        this.output.on('error',(data) => {
             toastr.error(data)
         })
 
@@ -66,23 +63,28 @@ export class Client{
             this.output.emit(type,data)
         })
 
+        // this.socket.specials.on('confirmhandshake',() => {
+        //     this.clientid = this.socket.serverclientid
+        //     this.socketid = this.socket.id
+        // })
+
         this.socket.connect(socketserver)
     }
 
 
     updateHtml(){
-        // this.root = MainApp({client:this})
-        // renderHTML()
+        this.root = MainApp({client:this})
+        this.special.emit('updatehtml',null)
     }
 
     deserialize(data:any[]){
-        var entities = data
-        var store = new EntityStore()
+        let entities = data
+        let store = new EntityStore()
         
-        for(var entity of entities){
+        for(let entity of entities){
             entity.__proto__ = Entity.prototype
             entity.store
-            store.insert(entity,null)
+            store.inject(entity)
         }
 
         return store

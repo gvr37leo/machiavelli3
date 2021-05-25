@@ -1,3 +1,4 @@
+import { to } from './utils'
 
 class Rule{
 

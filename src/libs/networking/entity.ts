@@ -17,7 +17,7 @@ class Entity{
 
     setChild(child:Entity){
         //remove child from old parent
-        var oldparent = Entity.globalEntityStore.get(child.parent)
+        let oldparent = Entity.globalEntityStore.get(child.parent)
         if(oldparent != null){
             remove(oldparent.children,child.id)
         }
@@ -44,8 +44,8 @@ class Entity{
     }
 
     descendants(cb:(ent:Entity) => boolean):Entity[]{
-        var children = this._children(cb)
-        var grandchildren = children.flatMap(c => c.descendants(cb))
+        let children = this._children(cb)
+        let grandchildren = children.flatMap(c => c.descendants(cb))
         return children.concat(grandchildren)
     }
     
@@ -80,7 +80,7 @@ class Entity{
     }
 
     ancestor(cb:(ent:Entity) => boolean):Entity{
-        var current:Entity = this
+        let current:Entity = this
         while(current != null && cb(current) == false){
             current = Entity.globalEntityStore.get(current.parent)
         }

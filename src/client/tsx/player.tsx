@@ -3,11 +3,11 @@ import { Client } from '../../client'
 import { Player } from '../models'
 
 export function RenderPlayer(props:{player:Player, client:Client, onClick?}){
-    var currentplayer = props.client.store.getCurrentPlayer()
-    var sessionplayer = props.client.store.getSessionPlayer(props.client.clientid)
-    var boardcards = props.player.childByName('board')._children()
-    var handcards = props.player.childByName('hand')._children()
-    var bordercolor = 'white'
+    let currentplayer = props.client.store.getCurrentPlayer()
+    let sessionplayer = props.client.store.getClientPlayer(props.client.socket.serverclientid)
+    let boardcards = props.player.childByName('board')._children()
+    let handcards = props.player.childByName('hand')._children()
+    let bordercolor = 'white'
     if(currentplayer.id == props.player.id){
         bordercolor = 'red'
     }

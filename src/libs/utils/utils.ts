@@ -1,6 +1,6 @@
 import {Vector} from '../vector/vector'
 
-var TAU = Math.PI * 2
+let TAU = Math.PI * 2
 export {TAU}
 
 export function map(val:number,from1:number,from2:number,to1:number,to2:number):number{
@@ -13,7 +13,7 @@ export function inverseLerp(val:number,a:number,b:number):number{
 
 export function inRange(min: number, max: number, value: number):boolean{
     if(min > max){
-        var temp = min;
+        let temp = min;
         min = max;
         max = temp;
     }
@@ -39,7 +39,7 @@ export function rangeContain(a1: number, a2: number, b1: number, b2: number):boo
 }
 
 export function startMouseListen(localcanvas:HTMLCanvasElement){
-    var mousepos = new Vector(0,0)
+    let mousepos = new Vector(0,0)
     document.addEventListener('mousemove',(e) => {
         mousepos.overwrite(getMousePos(localcanvas,e))
     })
@@ -47,16 +47,16 @@ export function startMouseListen(localcanvas:HTMLCanvasElement){
 }
 
 export function getMousePos(canvas:HTMLCanvasElement, evt:MouseEvent) {
-    var rect = canvas.getBoundingClientRect();
+    let rect = canvas.getBoundingClientRect();
     return new Vector(evt.clientX - rect.left, evt.clientY - rect.top)
 }
 
 export function createCanvas(x: number, y: number){
-    var canvas = document.createElement('canvas')
+    let canvas = document.createElement('canvas')
     canvas.width = x;
     canvas.height = y;
     document.body.appendChild(canvas)
-    var ctxt = canvas.getContext('2d')
+    let ctxt = canvas.getContext('2d')
     return {ctxt:ctxt,canvas:canvas};
 }
 
@@ -65,9 +65,9 @@ export function random(min: number, max: number){
 }
 
 
-var lastUpdate = Date.now();
+let lastUpdate = Date.now();
 export function loop(callback){
-    var now = Date.now()
+    let now = Date.now()
     callback((now - lastUpdate) / 1000)
     lastUpdate = now
     requestAnimationFrame(() => {
@@ -79,7 +79,7 @@ export function mod(number: number, modulus: number){
     return ((number%modulus)+modulus)%modulus;
 }
 
-var keys = {}
+let keys = {}
 
 document.addEventListener('keydown', (e) => {
     keys[e.key] = true
@@ -90,7 +90,7 @@ document.addEventListener('keyup', (e) => {
 })
 
 export function getMoveInput():Vector{
-    var dir = new Vector(0,0)
+    let dir = new Vector(0,0)
     if(keys['a'])dir.x--//left
     if(keys['w'])dir.y++//up
     if(keys['d'])dir.x++//right
@@ -99,15 +99,15 @@ export function getMoveInput():Vector{
 }
 
 export function getMoveInputYFlipped():Vector{
-    var input = getMoveInput()
+    let input = getMoveInput()
     input.y *= -1
     return input
 }
 
 export function loadTextFiles(strings:string[]){
-    var promises = []
-    for(var string of strings){
-        var promise = fetch(string)
+    let promises = []
+    for(let string of strings){
+        let promise = fetch(string)
         .then(resp => resp.text())
         .then(text => text)
         promises.push(promise)
@@ -116,11 +116,11 @@ export function loadTextFiles(strings:string[]){
 }
 
 export function loadImages(urls:string[]):Promise<HTMLImageElement[]>{
-    var promises:Promise<HTMLImageElement>[] = []
+    let promises:Promise<HTMLImageElement>[] = []
 
-    for(var url of urls){
+    for(let url of urls){
         promises.push(new Promise((res,rej) => {
-            var image = new Image()
+            let image = new Image()
             image.onload = e => {
                 res(image)     
             }
@@ -135,10 +135,10 @@ export function findbestIndex<T>(list:T[], evaluator:(v:T) => number):number {
     if (list.length < 1) {
         return -1;
     }
-    var bestIndex = 0;
-    var bestscore = evaluator(list[0])
-    for (var i = 1; i < list.length; i++) {
-        var score = evaluator(list[i])
+    let bestIndex = 0;
+    let bestscore = evaluator(list[0])
+    for (let i = 1; i < list.length; i++) {
+        let score = evaluator(list[i])
         if (score > bestscore) {
             bestscore = score
             bestIndex = i
@@ -148,7 +148,7 @@ export function findbestIndex<T>(list:T[], evaluator:(v:T) => number):number {
 }
 
 export function string2html(string): HTMLElement {
-    var div = document.createElement('div')
+    let div = document.createElement('div')
     div.innerHTML = string;
     return div.children[0] as HTMLElement;
 }
@@ -163,7 +163,7 @@ export function to(a:number,b:number):number{
 }
 
 export function swap<T>(arr:T[],a:number = 0,b:number = 1){
-    var temp = arr[a];
+    let temp = arr[a];
     arr[a] = arr[b];
     arr[b] = temp;
 }
@@ -177,8 +177,8 @@ export function last<T>(arr:T[]):T{
 }
 
 export function create2DArray<T>(size:Vector,filler:(pos:Vector) => T){
-    var result = new Array(size.y)
-    for(var i = 0; i < size.y;i++){
+    let result = new Array(size.y)
+    for(let i = 0; i < size.y;i++){
         result[i] = new Array(size.x)
     }
     size.loop2d(v => {
@@ -200,7 +200,7 @@ export function copy2dArray<T>(arr:T[][]){
 }
 
 export function round(number,decimals){
-    var mul = 10 ** decimals
+    let mul = 10 ** decimals
     return Math.round(number *  mul) / mul
 }
 
@@ -230,7 +230,7 @@ export class RNG{
 
 
 export function shuffle<T>(array:T[],rng:RNG){
-    var currentIndex = array.length, temporaryValue, randomIndex;
+    let currentIndex = array.length, temporaryValue, randomIndex;
     while (0 !== currentIndex) {
         randomIndex = Math.floor(rng.norm() * currentIndex);
         currentIndex -= 1;
@@ -244,7 +244,7 @@ export function shuffle<T>(array:T[],rng:RNG){
 }
 
 export function remove(arr, value) {
-    var index = arr.indexOf(value);
+    let index = arr.indexOf(value);
     if (index > -1) {
       arr.splice(index, 1);
     }

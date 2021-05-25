@@ -59,7 +59,7 @@ export class Player extends Entity{
     discovermax: number
     
     clientid
-    sessionid
+    socketid
     disconnected = false
     dctimestamp = 0
 
