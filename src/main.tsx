@@ -75,6 +75,7 @@ function hookupserverandgame(){
 //clientside
 let client = new Client()
 client.connect(socketserver)
+client.input.emit('playerjoin',{name:'ana'})
 
 // client.socket.input.emit('playerjoin', { name:'aba' })
 // gamemanager.input.addAndTrigger('gamestart',{})
@@ -85,7 +86,9 @@ client.special.on('updatehtml',() => {
 })
 
 
-
+let clientb = new Client()
+clientb.connect(socketserver)
+clientb.socket.input.emit('playerjoin',{name:'bob'})
 // client.updateHtml()
 
 

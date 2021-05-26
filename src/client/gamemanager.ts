@@ -3,7 +3,10 @@ import {EventSystem, GenericEvent} from '../libs/event/eventsystem'
 import { Entity, EntityStore } from '../libs/utils/store'
 import {RNG, shuffle} from '../libs/utils/utils'
 import {genDB, generateCards} from './generateDB'
-import { Card, DiscoverOption, Game, Player, Role } from './models'
+import { Action, Card, DiscoverOption, Game, Player, Role } from './models'
+import { GameWonScreen } from './tsx/gamewonscreen'
+
+
 
 export class GameManager{
 
@@ -32,14 +35,14 @@ export class GameManager{
             let deck = this.store.add(new Entity({name:'deck'}),game)
             let discardpile = this.store.add(new Entity({name:'discardpile'}),game)
         
-            let moordenaar = this.store.add(new Role({name:'moordenaar',color:'white',image:'/res/moordenaar.png'}),rolesfolder)
-            let dief = this.store.add(new Role({name:'dief',color:'white',image:'/res/dief.png'}),rolesfolder)
-            let magier = this.store.add(new Role({name:'magier',color:'white',image:'/res/magier.png'}),rolesfolder)
-            let koning = this.store.add(new Role({name:'koning',color:'yellow',image:'/res/koning.png'}),rolesfolder)
-            let prediker = this.store.add(new Role({name:'prediker',color:'blue',image:'/res/prediker.png'}),rolesfolder)
-            let koopman = this.store.add(new Role({name:'koopman',color:'green',image:'/res/koopman.png'}),rolesfolder)
-            let bouwmeester = this.store.add(new Role({name:'bouwmeester',color:'white',image:'/res/bouwmeester.png'}),rolesfolder)
-            let condotierre = this.store.add(new Role({name:'condotierre',color:'red',image:'/res/condotierre.png'}),rolesfolder)
+            let moordenaar = this.store.add(new Role({name:'moordenaar',color:'white',image:'moordenaar.png'}),rolesfolder)
+            let dief = this.store.add(new Role({name:'dief',color:'white',image:'dief.png'}),rolesfolder)
+            let magier = this.store.add(new Role({name:'magier',color:'white',image:'magier.png'}),rolesfolder)
+            let koning = this.store.add(new Role({name:'koning',color:'yellow',image:'koning.png'}),rolesfolder)
+            let prediker = this.store.add(new Role({name:'prediker',color:'blue',image:'prediker.png'}),rolesfolder)
+            let koopman = this.store.add(new Role({name:'koopman',color:'green',image:'koopman.png'}),rolesfolder)
+            let bouwmeester = this.store.add(new Role({name:'bouwmeester',color:'white',image:'bouwmeester.png'}),rolesfolder)
+            let condotierre = this.store.add(new Role({name:'condotierre',color:'red',image:'condotierre.png'}),rolesfolder)
             // this.input.add('gamestart',null)
         })
 
@@ -64,33 +67,33 @@ export class GameManager{
             let koopman = rolesfolder.childByName('koopman')
             let condotierre = rolesfolder.childByName('condotierre')
         
-            this.store.add(new Card({cost:3 ,name:'jachtslot',      role:koning.id,         image:'/res/jachtslot.png'}),deck).duplicate(4)
-            this.store.add(new Card({cost:4 ,name:'slot',       role:koning.id,         image:'/res/slot.png'}),deck).duplicate(3)
-            this.store.add(new Card({cost:5 ,name:'paleis',     role:koning.id,         image:'/res/paleis.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:1 ,name:'tempel',     role:prediker.id,         image:'/res/tempel.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:2 ,name:'kerk',       role:prediker.id,         image:'/res/kerk.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:3 ,name:'abdij',      role:prediker.id,         image:'/res/abdij.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:4 ,name:'kathedraal',     role:prediker.id,         image:'/res/kathedraal.png'}),deck).duplicate(1)
-            this.store.add(new Card({cost:1 ,name:'taveerne',       role:koopman.id,         image:'/res/taveerne.png'}),deck).duplicate(4)
-            this.store.add(new Card({cost:2 ,name:'gildehuis',      role:koopman.id,         image:'/res/gildehuis.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:2 ,name:'markt',      role:koopman.id,         image:'/res/markt.png'}),deck).duplicate(3)
-            this.store.add(new Card({cost:3 ,name:'handelshuis',        role:koopman.id,         image:'/res/handelshuis.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:4 ,name:'haven',      role:koopman.id,         image:'/res/haven.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:5 ,name:'raadhuis',       role:koopman.id,         image:'/res/raadhuis.png'}),deck).duplicate(1)
-            this.store.add(new Card({cost:1 ,name:'wachttoren',     role:condotierre.id,         image:'/res/wachttoren.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:2 ,name:'kerker',     role:condotierre.id,         image:'/res/kerker.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:3 ,name:'toernooiveld',       role:condotierre.id,         image:'/res/toernooiveld.png'}),deck).duplicate(2)
-            this.store.add(new Card({cost:5 ,name:'vesting',        role:condotierre.id,         image:'/res/vesting.png'}),deck).duplicate(1)
-            this.store.add(new Card({cost:2 ,name:'hof_der_wonderen',       role:null,         image:'/res/hofderwonderen.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:3 ,name:'verdedigingstoren',      role:null,         image:'/res/verdedigingstoren.png'}),deck).duplicate(1)
-            this.store.add(new Card({cost:5 ,name:'laboratorium',       role:null,         image:'/res/laboratorium.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:5 ,name:'smederij',       role:null,         image:'/res/smederij.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:5 ,name:'observatorium',      role:null,         image:'/res/observatorium.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:5 ,name:'kerkhof',        role:null,         image:'/res/kerkhof.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:6 ,name:'bibliotheek',        role:null,         image:'/res/bibliotheek.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:6 ,name:'school_voor_magiers',        role:null,         image:'/res/schoolvoormagiers.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:6 ,name:'drakenburcht',       role:null,         image:'/res/drakenburcht.png'}),deck).duplicate(0)
-            this.store.add(new Card({cost:6 ,name:'universiteit',       role:null,         image:'/res/universiteit.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:3 ,name:'jachtslot',      role:koning.id,         image:'jachtslot.png'}),deck).duplicate(4)
+            this.store.add(new Card({cost:4 ,name:'slot',       role:koning.id,         image:'slot.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:5 ,name:'paleis',     role:koning.id,         image:'paleis.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:1 ,name:'tempel',     role:prediker.id,         image:'tempel.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:2 ,name:'kerk',       role:prediker.id,         image:'kerk.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:3 ,name:'abdij',      role:prediker.id,         image:'abdij.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:4 ,name:'kathedraal',     role:prediker.id,         image:'kathedraal.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:1 ,name:'taveerne',       role:koopman.id,         image:'taveerne.png'}),deck).duplicate(4)
+            this.store.add(new Card({cost:2 ,name:'gildehuis',      role:koopman.id,         image:'gildehuis.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:2 ,name:'markt',      role:koopman.id,         image:'markt.png'}),deck).duplicate(3)
+            this.store.add(new Card({cost:3 ,name:'handelshuis',        role:koopman.id,         image:'handelshuis.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:4 ,name:'haven',      role:koopman.id,         image:'haven.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:5 ,name:'raadhuis',       role:koopman.id,         image:'raadhuis.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:1 ,name:'wachttoren',     role:condotierre.id,         image:'wachttoren.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:2 ,name:'kerker',     role:condotierre.id,         image:'kerker.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:3 ,name:'toernooiveld',       role:condotierre.id,         image:'toernooiveld.png'}),deck).duplicate(2)
+            this.store.add(new Card({cost:5 ,name:'vesting',        role:condotierre.id,         image:'vesting.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:2 ,name:'hof_der_wonderen',       role:null,         image:'hofderwonderen.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:3 ,name:'verdedigingstoren',      role:null,         image:'verdedigingstoren.png'}),deck).duplicate(1)
+            this.store.add(new Card({cost:5 ,name:'laboratorium',       role:null,         image:'laboratorium.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:5 ,name:'smederij',       role:null,         image:'smederij.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:5 ,name:'observatorium',      role:null,         image:'observatorium.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:5 ,name:'kerkhof',        role:null,         image:'kerkhof.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:6 ,name:'bibliotheek',        role:null,         image:'bibliotheek.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:6 ,name:'school_voor_magiers',        role:null,         image:'schoolvoormagiers.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:6 ,name:'drakenburcht',       role:null,         image:'drakenburcht.png'}),deck).duplicate(0)
+            this.store.add(new Card({cost:6 ,name:'universiteit',       role:null,         image:'universiteit.png'}),deck).duplicate(0)
 
             shuffle(deckfolder.children,this.rng)
             let roles = this.store.getRoles()
@@ -110,133 +113,195 @@ export class GameManager{
             game.burgledRoleid = null
             game.murderedRoleid = null
             game.status = 'started'
-            game.roleturnid = roles.first().id
+            game.roleturnindex = roles.first().id
             game.flag()
             this.input.add('roundstart',{})
         })
 
         this.input.listen('roundstart', (e) => {
-            let players = this.store.getPlayers()
-            let charttable = {
-                2:0,
-                3:0,
-                4:2,
-                5:1,
-                6:0,
-                7:0,
-            }
 
-            //first pick is kingplayer
+            //4,5,6
+            //schud kaarten
+            //leg 0-2 open op tafel (koning wordt vervangen)
+            //bekijk bovenste karakter en leg gedekt af
+            //doorgeven aan elke speler
+            //laatste karakter gedekt op tafel
+
+            //2
+            let game = this.store.getGame()
+            let players = this.store.getPlayers()
+            game.actions = []
+            game.actionindex = 0
+            
             if(players.length == 2){
-                kingDiscard();
-                pick();pass();//A
-                pick();discardClosed(1);pass();//B
-                pick();discardClosed(1);pass();//A
-                pick();discardClosed(1);pass();//B
+                game.actions = [
+                    new Action('kingDiscard'),
+                    new Action('pick'),new Action('pass'),
+                    new Action('pick'),new Action('discardClosed'),new Action('pass'),
+                    new Action('pick'),new Action('discardClosed'),new Action('pass'),
+                    new Action('pick'),new Action('discardClosed'),new Action('pass'),
+                    new Action('start'),
+                ]
             }else if(players.length == 3){
-                kingDiscard();
-                pick();pass();//A
-                pick();pass();//B
-                pick();pass();//C
-                pick();pass();//A
-                pick();pass();//B
-                pick();pass();//C
-            }else{
-                discardOpen(charttable[players.length])
-                kingDiscard()
+                game.actions = [
+                    new Action('kingDiscard'),
+                    new Action('pick'),new Action('pass'),
+                    new Action('pick'),new Action('pass'),
+                    new Action('pick'),new Action('pass'),
+                    new Action('pick'),new Action('pass'),
+                    new Action('pick'),new Action('pass'),
+                    new Action('pick'),new Action('pass'),
+                    new Action('start'),
+                ]
+            }else if(players.length >= 4 && players.length <= 7){
+                let charttable = {
+                    2:0,
+                    3:0,
+                    4:2,
+                    5:1,
+                    6:0,
+                    7:0,
+                }
+                
+                game.actions = [
+                    ...new Array(charttable[players.length]).map(v => new Action('discardOpen')),
+                    new Action('kingDiscard'),
+                ]
+
                 for(let player of players){
                     if(players.length == 7 && player == players.last()){
-                        pickWithKingCard()
-                        pass()
+                        game.actions.push(new Action('pickWithKingCard'),new Action('pass'))
                     }else{
-                        pick()
-                        pass()
+                        game.actions.push(new Action('pick'),new Action('pass'))
                     }
                 }
+                game.actions.push(new Action('start'),)
+            }else{
+                //not correct amount of players
             }
 
-            function kingDiscard(){
-
-            }
-
-            function discardOpen(count){
-                //if 1 is king shuffle it back in roles
-            }
-
-            function discardClosed(count){
-
-            }
-
-            function pick(){
-
-            }
-
-            function pickWithKingCard(){
-
-            }
-
-            function pass(){
-
+            for(let role of this.store.getRoles()){
+                role.incomephaseTaken = false
             }
 
             for(let player of this.store.getPlayers()){
                 player.specialUsed = false
             }
-            let rolestoPick = this.store.getRoles()
-            this.input.add('rolepick',{player:this.store.getPlayers().first(),roles:rolestoPick})
+
+            game.closeddiscardedroles = []
+            game.opendiscardedroles = []
+            game.kingshownRole = 0
+            game.rolestopick = shuffle(this.store.getRoles(),this.rng) 
+            game.actionindex = 0
+            game.pickingplayerindex = 0//oldest player
+            this.input.add('rolepickaction',null)
         })
 
-        this.input.listen('rolepick', (e) => {
+        this.input.listen('rolepickaction', () => {
+            let game = this.store.getGame()
             let players = this.store.getPlayers()
+            let action = game.actions[game.actionindex]
 
-            this.discoverRole(e.player,e.roles,(index) => {
-                e.roles.remove(index)
-
-                if(e.roles.length > 0){
-                    let nextplayer = players[(players.findIndex(p => p.id == e.player.id) + 1) % players.length]
-                    this.input.add('rolepick',{player:nextplayer,roles:e.roles})
-                }else{
-                    this.input.add('roleturn', this.store.getRoles().first().id)
+            if(action.type == 'kingDiscard'){
+                let kingshownrole = game.rolestopick.remove(0)
+                game.kingshownRole = kingshownrole.id
+                game.closeddiscardedroles.push(kingshownrole)
+                this.nextPickAction()
+            }else if(action.type == 'pick'){
+                let pickingplayer = players[game.pickingplayerindex % players.length]
+                this.discoverRole(pickingplayer,game.rolestopick,(i) => {
+                    let role = game.rolestopick.remove(i)
+                    role.player = pickingplayer.id
+                    this.nextPickAction()
+                })
+            }else if(action.type == 'pass'){
+                game.pickingplayerindex++
+                this.nextPickAction()
+            }else if(action.type == 'discardOpen'){
+                
+                let role = game.rolestopick.remove(0)
+                if(role.name == 'koning'){
+                    let king = role
+                    role = game.rolestopick.remove(0)
+                    game.rolestopick.push(king)
+                    game.rolestopick = shuffle(game.rolestopick,this.rng) 
                 }
-            })
+                game.opendiscardedroles.push(role)
+            }else if(action.type == 'discardClosed'){
+                let pickingplayer = players[game.pickingplayerindex % players.length]
+                this.discoverRole(pickingplayer,game.rolestopick,(i) => {
+                    
+                    game.closeddiscardedroles.push(game.rolestopick.remove(i))
+                    this.nextPickAction()
+                })
+            }else if(action.type == 'pickWithKingCard'){
+                let pickingplayer = players[game.pickingplayerindex % players.length]
+                let rolestopick = [...game.rolestopick, ...game.closeddiscardedroles]
+                this.discoverRole(pickingplayer,rolestopick,(i) => {
+                    let role = rolestopick.remove(i)
+                    role.player = pickingplayer.id
+                    this.nextPickAction()
+                })
+            }else if(action.type == 'start'){
+                game.roleturnindex = 0
+                this.input.add('roleturn', null)
+            }
         })
 
         this.input.listen('roleturn', (e) => {
             let game = this.store.getGame()
-            let role = this.store.get(game.roleturnid) as Role
+            let role = this.store.getRoles()[game.roleturnindex]
             if(role.player == null || game.murderedRoleid == role.id){
                 this.incrementRoleTurn()
             }else{
                 let player = this.store.get(role.player) as Player
                 player.buildactions = 1
-
-                this.discover(player,[new DiscoverOption({description:'money'}),new DiscoverOption({description:'cards'})],(e) => {
-                    if(e.data == 'money'){
-                        player.money += 2
-                    }else if(e.data == 'cards'){
-
-                        let top2 = this.store.getDeckFolder()._children().slice(0,2) as Card[]
-                        this.discoverCard(player,top2,(e) => {
-                            let hand = player.childByName('hand')
-                            top2[e].setParent(hand)
-                        })
-                    }
-                })
             }
         })
 
-
-        this.input.addRule('specialability','not your turn',() => {
-            return false
+        this.input.addRule('takemoney','already had income', (data) => {
+            var activerole = this.store.getActiveRole()
+            return activerole.incomephaseTaken == false
         })
 
-        this.input.addRule('specialability','ability already used',() => {
-            return false
+        this.input.listen('takemoney',(data) => {
+            let clientplayer = this.store.getClientPlayer(data.clientid)
+            clientplayer.money += 2
+            clientplayer.flag()
+            var activerole = this.store.getActiveRole()
+            activerole.incomephaseTaken = true
+            activerole.flag()
+        })
+
+        this.input.addRule('drawcards','already had income', (data) => {
+            var activerole = this.store.getActiveRole()
+            return activerole.incomephaseTaken == false
+        })
+
+        this.input.listen('drawcards',(data) => {
+            let clientplayer = this.store.getClientPlayer(data.clientid)
+            var activerole = this.store.getActiveRole()
+            activerole.incomephaseTaken = true
+            activerole.flag()
+            var top2 = this.store.getDeckFolder()._children().slice(0,2) as Card[]
+            this.discoverCard(clientplayer,top2,(i) => {
+                top2.splice(i,1)[0].setParent(clientplayer.childByName('hand'))
+                top2[0].setParent(this.store.getDiscardFolder())
+            })
+        })
+
+        this.input.addRule('specialability','not your turn',(data) => {
+            let clientplayer = this.store.getClientPlayer(data.clientid)
+            return clientplayer.id == this.store.getCurrentPlayer().id
+        })
+
+        this.input.addRule('specialability','ability already used',(data) => {
+            return this.store.getActiveRole().specialUsed == false
         })
 
         this.input.listen('specialability', (e) => {
             let game = this.store.getGame()
-            let role = this.store.get(game.roleturnid) as Role
+            let role = this.store.get(game.roleturnindex) as Role
             let player = this.store.get(role.player) as Player
             
 
@@ -321,6 +386,8 @@ export class GameManager{
             player.money -= card.cost
             player.flag()
         })
+
+
         
         this.input.listen('pass',() => {
             this.incrementRoleTurn()
@@ -360,11 +427,24 @@ export class GameManager{
         }
     }
 
+    addTurnAndDiscoverCheck(action){
+        this.input.addRule(action,'not your turn', (data) => {
+            let clientplayer = this.store.getClientPlayer(data.clientid)
+            let currentplayer = this.store.getCurrentPlayer()
+            return clientplayer.id == currentplayer.id
+        })
+
+        this.input.addRule(action,'cant do while discovering', (data) => {
+            let clientplayer = this.store.getClientPlayer(data.clientid)
+            return clientplayer.isDiscovering == false
+        })
+    }
+
     incrementRoleTurn(){
         let game = this.store.getGame()
         let roles = this.store.getRoles()
 
-        let nextroleindex = roles.findIndex(r => r.id == game.roleturnid) + 1
+        let nextroleindex = game.roleturnindex + 1
         if(nextroleindex >= roles.length){
             //check for winner
             if(this.isGameOver()){
@@ -378,12 +458,9 @@ export class GameManager{
                 this.input.add('roundstart',{})
             }
         }else{
-            game.roleturnid = roles[nextroleindex].id
+            game.roleturnindex = nextroleindex
             this.input.add('roleturn',{})
         }
-        
-
-        game.roleturnid
     }
 
     isGameOver() {
@@ -408,6 +485,13 @@ export class GameManager{
             player.score = buildingscore + finishscore + combiscore
             player.flag()
         }
+    }
+
+    nextPickAction(){
+        let game = this.store.getGame()
+        game.actionindex++
+        game.flag()
+        this.input.add('rolepickaction',null)
     }
 
     processTaxes(role:Role){

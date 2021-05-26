@@ -1,5 +1,12 @@
 import {Entity} from '../libs/utils/store'
 
+export class Action{
+    
+    constructor(public type:string){
+
+    }
+}
+
 export class Game extends Entity{
     
 
@@ -7,10 +14,17 @@ export class Game extends Entity{
     murderedRoleid = 0
     burgledRoleid = 0
     firstFinishedPlayer = 0
-    kingshownRole = 0
-    roleturnid = 0
+    roleturnindex = 0
     status = 'init'
     winnerid = 0
+
+    rolestopick:Role[] = []
+    opendiscardedroles:Role[] = []
+    closeddiscardedroles:Role[] = []
+    pickingplayerindex = 0
+    kingshownRole = 0
+    actions: Action[]
+    actionindex = 0
 
     constructor(init?:Partial<Game>){
         super()
@@ -24,7 +38,8 @@ export class Role extends Entity{
     player:number
     color
     image
-    specialUsed:boolean
+    specialUsed = false
+    incomephaseTaken = false
 
     constructor(init?:Partial<Role>){
         super()

@@ -16,7 +16,15 @@
 </head>
 <body>
     <div id="app"></div>
-    <script>__REACT_DEVTOOLS_GLOBAL_HOOK__ = true;</script>
+    <script>
+        // https://stackoverflow.com/questions/42196819/disable-hide-download-the-react-devtools
+        __REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+            supportsFiber: true,
+            inject: function() {},
+            onCommitFiberRoot: function() {},
+            onCommitFiberUnmount: function() {},
+        };
+    </script>
     <script src="dist/bundle.js"></script>
 </body>
 </html>

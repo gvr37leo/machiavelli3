@@ -142,9 +142,13 @@ export class EntityStore{
         }
     }
 
-    getCurrentPlayer(){
+    getActiveRole(){
         let game = this.getGame()
-        let activerole = this.getRoles().find(r => r.id == game.roleturnid)
+        return this.getRoles()[game.roleturnindex]
+    }
+
+    getCurrentPlayer(){
+        let activerole = this.getActiveRole()
         let activeplayer = this.get(activerole.player)
         return activeplayer
     }
