@@ -84,6 +84,8 @@ export class SocketServer{
             console.log(`user connected:${serverclient.id}`)
             this.specials.emit('clientconnected',serverclient)
             socket.output.emit('confirmhandshake',{clientid:serverclient.id, socketid:socket.id})
+
+            //todo
             // this.updateClients()
 
             //stop bubbling event/consume event

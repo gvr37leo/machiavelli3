@@ -14,7 +14,7 @@ export class Client{
     input = new GenericEvent()
     special = new GenericEvent()
     store:EntityStore = new EntityStore()
-    lastprocessedversion = null
+    lastprocessedversion = 0
 
     // <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
     socket: IClientSocket//socket.io socket

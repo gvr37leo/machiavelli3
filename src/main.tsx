@@ -40,15 +40,16 @@ function hookupserverandgame(){
         }),playerfolder)
         gamemanager.store.add(new Entity({name:'hand'}),player)
         gamemanager.store.add(new Entity({name:'board'}),player)
-        //add player
+        updateClients()
     })
 
     socketserver.specials.on('disconnect',() => {
-        //updateclients/status
+        updateClients()
     })
 
     socketserver.specials.on('clientremoved',() => {
-        //remove player
+        //todo delete associated player
+        updateClients()
     })
 
     function updateClients(){
@@ -86,9 +87,11 @@ client.special.on('updatehtml',() => {
 })
 
 
-let clientb = new Client()
-clientb.connect(socketserver)
-clientb.socket.input.emit('playerjoin',{name:'bob'})
+setTimeout(() => {
+    let clientb = new Client()
+    clientb.connect(socketserver)
+    clientb.socket.input.emit('playerjoin',{name:'bob'})
+}, 1000);
 // client.updateHtml()
 
 
