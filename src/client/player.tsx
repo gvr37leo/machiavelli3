@@ -1,6 +1,6 @@
 import React from 'react'
-import { Client } from '../../client'
-import { Player } from '../models'
+import { Client } from '../client'
+import { Player } from '../../shared/models'
 
 export function RenderPlayer(props:{player:Player, client:Client, onClick?}){
     let currentplayer = props.client.store.getCurrentPlayer()

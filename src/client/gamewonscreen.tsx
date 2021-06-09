@@ -1,5 +1,5 @@
 import React from 'react'
-import { Client } from "../../client"
+import { Client } from "../client"
 
 export function GameWonScreen(props:{client:Client}){
     let game = props.client.store.getGame()

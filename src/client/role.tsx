@@ -1,6 +1,6 @@
 import React from 'react'
-import { Client } from '../../client'
-import { Role } from '../models'
+import { Client } from '../client'
+import { Role } from '../../shared/models'
 
 export function RoleView(props:{role:Role, client:Client, onClick?}){
 

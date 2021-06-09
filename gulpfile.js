@@ -30,7 +30,7 @@ function transpile(cb) {
     })
     .plugin(tsify)
     .transform("babelify", {
-        presets: ["es2015","react"],
+        presets: ["esnext","react"],
         extensions: [".ts",".tsx"],
     })
     .bundle()

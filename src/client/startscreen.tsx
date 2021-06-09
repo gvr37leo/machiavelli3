@@ -1,5 +1,5 @@
 import React from 'react'
-import { Client } from "../../client"
+import { Client } from "../client"
 
 export function StartScreen(props:{client:Client}){
     return <div style={{display:"flex", justifyContent:"center", alignItems:"center", height:"100vh"}} >

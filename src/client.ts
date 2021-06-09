@@ -1,9 +1,8 @@
-import {EventSystem, GenericEvent} from './libs/event/eventsystem'
-import {EntityStore,Entity} from './libs/utils/store'
-import { to } from './libs/utils/utils'
-import {MainApp} from './client/tsx/mainapp'
-import { EventQueue } from './libs/event/eventqueue'
-import { ClientSocket, IClientSocket, SocketServer } from './spoofs'
+import {EventSystem, GenericEvent} from '../shared/event/eventsystem'
+import {EntityStore,Entity} from '../shared/utils/store'
+import { to } from '../shared/utils/utils'
+import {MainApp} from './client/mainapp'
+import { EventQueue } from '../shared/event/eventqueue'
 
 declare let toastr
 
@@ -17,7 +16,7 @@ export class Client{
     lastprocessedversion = 0
 
     // <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
-    socket: IClientSocket//socket.io socket
+    socket: any//socket.io socket
 
 
     constructor(){
@@ -53,22 +52,8 @@ export class Client{
     }
 
     //connect client with clientsocket and then clientsocket to server/serversocket
-    connect(socketserver:SocketServer){
-        this.socket = new ClientSocket()
-        this.input.onany((data,type) => {
-            this.socket.input.emit(type,data)
-        })
-        
-        this.socket.output.onany((data,type) => {
-            this.output.emit(type,data)
-        })
+    connect(){
 
-        // this.socket.specials.on('confirmhandshake',() => {
-        //     this.clientid = this.socket.serverclientid
-        //     this.socketid = this.socket.id
-        // })
-
-        this.socket.connect(socketserver)
     }
 
 

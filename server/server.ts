@@ -5,13 +5,14 @@
 
 import {SocketServer} from './spoofs.js'
 import {GameManager} from './gamemanager.js'
+import express from 'express'
+import {Server} from 'http'
+import {Server as IOServer} from 'socket.io'
 
 var gamemanager = new GameManager()
 var x = new SocketServer()
 
-import express from 'express'
-import {Server} from 'http'
-import {Server as IOServer} from 'socket.io'
+
 console.log('hello')
 const app = express();
 const http = new Server(app);

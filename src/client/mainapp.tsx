@@ -1,5 +1,5 @@
 import React from "react"
-import { Client } from "../../client"
+import { Client } from "../client"
 import { GameWonScreen } from "./gamewonscreen"
 import { RenderHomepage } from "./homepage"
 import { StartScreen } from "./startscreen"

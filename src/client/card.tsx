@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card } from '../models'
+import { Card } from '../../shared/models'
 
 export function CardView(props:{card:Card,onClick}){
     let card = this.props.card

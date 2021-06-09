@@ -1,6 +1,6 @@
 import React from "react"
-import { Client } from "../../client"
-import { Card } from "../models"
+import { Client } from "../client"
+import { Card } from "../../shared/models"
 import { CardView } from "./card"
 import { Modal } from "./modal"
 import { RenderPlayer } from "./player"
