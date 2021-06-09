@@ -1,10 +1,8 @@
-import {EventQueue} from '../libs/event/eventqueue'
-import {EventSystem, GenericEvent} from '../libs/event/eventsystem'
-import { Entity, EntityStore } from '../libs/utils/store'
-import {RNG, shuffle} from '../libs/utils/utils'
-import {genDB, generateCards} from './generateDB'
-import { Action, Card, DiscoverOption, Game, Player, Role } from './models'
-import { GameWonScreen } from './tsx/gamewonscreen'
+import {EventQueue} from '../shared/event/eventqueue.js'
+import {EventSystem, GenericEvent} from '../shared/event/eventsystem.js'
+import { Entity, EntityStore } from '../shared/utils/store.js'
+import {RNG, shuffle} from '../shared/utils/utils.js'
+import { Action, Card, DiscoverOption, Game, Player, Role } from '../shared/models.js'
 
 
 

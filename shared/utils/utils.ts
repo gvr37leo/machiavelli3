@@ -1,4 +1,4 @@
-import {Vector} from '../vector/vector'
+import {Vector} from '../vector/vector.js'
 
 let TAU = Math.PI * 2
 export {TAU}
@@ -79,30 +79,6 @@ export function mod(number: number, modulus: number){
     return ((number%modulus)+modulus)%modulus;
 }
 
-let keys = {}
-
-document.addEventListener('keydown', (e) => {
-    keys[e.key] = true
-})
-
-document.addEventListener('keyup', (e) => {
-    keys[e.key] = false
-})
-
-export function getMoveInput():Vector{
-    let dir = new Vector(0,0)
-    if(keys['a'])dir.x--//left
-    if(keys['w'])dir.y++//up
-    if(keys['d'])dir.x++//right
-    if(keys['s'])dir.y--//down
-    return dir;
-}
-
-export function getMoveInputYFlipped():Vector{
-    let input = getMoveInput()
-    input.y *= -1
-    return input
-}
 
 export function loadTextFiles(strings:string[]){
     let promises = []

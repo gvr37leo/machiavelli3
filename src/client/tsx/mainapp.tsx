@@ -22,6 +22,9 @@ export function MainApp({client}:{client:Client}){
                 if(sessionplayer.name == ''){
                     return <StartScreen client={client} />
                 }
+                if(game.status == 'init'){
+                    return <div>game waiting to start</div>
+                }
                 if(game.status == 'started'){
                     return <RenderHomepage client={client} />
                 }
@@ -73,40 +76,3 @@ export function MainApp({client}:{client:Client}){
         
     )
 }
-
-
-
-
-/*
-space elevator
-    low mass solid bodies
-    can be used in combination with tether to catch fast arriving spacecraft or lauch spacecraft at high speed
-
-space tether
-    railed on asteroids
-    force = rot^2 * length
-    electric tethering
-    ion engines
-    combustion engines
-    tax spaceships for fuel
-    returning craft
-    
-    
-    efficiency tricks at cost of availability
-    if only payload matters,cargo can be detached from spaceship
-    skydrone for meeting up with aircraft
-    counterweight
-    stepped tether ladder
-    rotating
-    elliptic orbit(cardiod)
-    whip at end
-    2 step tether for shorter but faster spinning skyhook
-
-
-
-
-
-
-
-
-*/

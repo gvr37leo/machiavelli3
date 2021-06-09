@@ -1,6 +1,6 @@
 
-import {EventSystem} from './eventsystem'
-import {first} from '../utils/utils'
+import {EventSystem} from './eventsystem.js'
+import {first} from '../utils/utils.js'
 
 export class EventQueue{
     idcounter = 0

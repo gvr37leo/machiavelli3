@@ -1,7 +1,7 @@
-import { EventQueue } from "./libs/event/eventqueue"
-import { EventSystem, GenericEvent } from "./libs/event/eventsystem"
-import { Store } from './libs/utils/store'
-import { to } from "./libs/utils/utils"
+import { EventQueue } from "../shared/event/eventqueue.js"
+import { EventSystem, GenericEvent } from "../shared/event/eventsystem.js"
+import { Store } from '../shared/utils/store.js'
+import { to } from "../shared/utils/utils.js"
 
 export class ServerClient{
 
@@ -82,13 +82,10 @@ export class SocketServer{
             socket.clientid = serverclient.id
             serverclient.disconnected = false
             console.log(`user connected:${serverclient.id}`)
-            this.specials.emit('clientconnected',serverclient)
             socket.output.emit('confirmhandshake',{clientid:serverclient.id, socketid:socket.id})
+            this.specials.emit('clientconnected',serverclient)
 
-            //todo
-            // this.updateClients()
-
-            //stop bubbling event/consume event
+            //updating clients is done by consumer
         })
 
         socket.specials.on('disconnect',() => {
@@ -158,12 +155,13 @@ export interface IClientSocket{
 export class ClientSocket implements IClientSocket{
 
 
-    id
+    id = -1
     input = new GenericEvent()
     output = new GenericEvent()
     specials = new GenericEvent()
 
-    serverclientid: any
+    serverclientid = -1
+    localdebug = true
 
     // on(type: any, cb: any) {
     //     this.input.on(type,cb)
@@ -186,7 +184,12 @@ export class ClientSocket implements IClientSocket{
 
         this.specials.on('connect',() => {
             console.log('connected')
+            //todo dit gaat fout op lokaal testen
             let clientid = parseInt(sessionStorage.getItem('clientid'))
+            if(this.localdebug){
+                clientid = null
+            }
+
             clientid = isNaN(clientid) ? null : clientid
             this.input.emit('handshake', {clientid})
         })

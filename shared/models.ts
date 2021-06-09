@@ -1,4 +1,4 @@
-import {Entity} from '../libs/utils/store'
+import {Entity} from './utils/store.js'
 
 export class Action{
     

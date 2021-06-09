@@ -34,7 +34,7 @@ export class Client{
 
         this.output.on('update',(data) => {
             this.lastprocessedversion = data.version
-            this.store = this.deserialize(data.data)
+            this.store = this.deserialize(data.upserts)
             this.updateHtml()
         })
 
@@ -83,7 +83,6 @@ export class Client{
         
         for(let entity of entities){
             entity.__proto__ = Entity.prototype
-            entity.store
             store.inject(entity)
         }
 

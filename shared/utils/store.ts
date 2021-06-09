@@ -1,6 +1,6 @@
-import { Card, Game, Player, Role } from '../../client/models'
-import {EventQueue} from '../event/eventqueue'
-import { remove } from './utils'
+import { Card, Game, Player, Role } from '../models.js'
+import {EventQueue} from '../event/eventqueue.js'
+import { remove } from './utils.js'
 
 export class EntityStore{
 
@@ -109,8 +109,8 @@ export class EntityStore{
                 this.upserts.delete(deletion)
             }
         }
-        let deletions = Array.from(this.deletions.keys())
-        let upserts = Array.from(this.upserts.entries()).map(e => this.get(e[0]))
+        let deletions = JSON.parse(JSON.stringify(Array.from(this.deletions.keys())))
+        let upserts = JSON.parse(JSON.stringify(Array.from(this.upserts.entries()).map(e => this.get(e[0]))))
         this.upserts.clear()
         this.deletions.clear()
         if(upserts.length > 0 || deletions.length > 0){
@@ -130,10 +130,13 @@ export class EntityStore{
         for(let upsert of upserts){
             let local = this.get(upsert.id)
             if(local == null){
-                this.insert(upsert,null)
+                //insert
+                this.inject(upsert)
                 upsert.__proto__ = Entity.prototype
             }else{
+                //update
                 Object.assign(local,upsert)
+                local.store = this
             }
         }
 
