@@ -5,12 +5,12 @@ import { CardView } from "./card"
 import { Modal } from "./modal"
 import { RenderPlayer } from "./player"
 
-export function RenderHomepage({client}:{client:Client}){
+export function RenderHomepage({client}){
     let game = client.store.getGame()
     let players = client.store.getPlayers()
     let sessionplayer = client.store.getClientPlayer(client.socket.serverclientid)
-    let boardcards = sessionplayer.childByName('board')._children() as Card[]
-    let handcards = sessionplayer.childByName('hand')._children() as Card[]
+    let boardcards = sessionplayer.childByName('board')._children()
+    let handcards = sessionplayer.childByName('hand')._children()
     let currentplayer = client.store.getCurrentPlayer()
 
     return (

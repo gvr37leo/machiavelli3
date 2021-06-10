@@ -4,22 +4,22 @@ import { remove } from './utils.js'
 
 export class EntityStore{
 
-    map = new Map<number,Entity>()
+    map = new Map()
     counter = 0
-    upserts = new Set<number>()
-    deletions = new Set<number>()
+    upserts = new Set()
+    deletions = new Set()
     versionnumber = 0
 
-    get(id:number){
+    get(id){
         return this.map.get(id)
     }
 
-    add(item:Entity,parent:Entity){
+    add(item,parent){
         item.id = this.counter++
         return this.insert(item,parent)
     }
 
-    insert(item:Entity,parent:Entity){
+    insert(item,parent){
         item.store = this
         this.map.set(item.id, item)
         this.move(item, parent)//event trigger happens in move
@@ -27,7 +27,7 @@ export class EntityStore{
         return item
     }
 
-    inject(item:Entity){
+    inject(item){
         item.store = this
         this.map.set(item.id, item)
         this.upserts.add(item.id)
@@ -48,7 +48,7 @@ export class EntityStore{
         return ent
     }
 
-    move(ent:Entity, parent:Entity){
+    move(ent, parent){
         let oldparent = this.get(ent.parent)
         if(oldparent != null){
             remove(oldparent.children,ent.id)
@@ -63,7 +63,7 @@ export class EntityStore{
         }
     }
 
-    ancestor(ent:Entity,type:string){
+    ancestor(ent,type){
         let current = ent
         while(current != null){
             if(current.type == type){
@@ -74,23 +74,23 @@ export class EntityStore{
         return null
     }
 
-    parent(ent:Entity){
+    parent(ent){
         return this.map.get(ent.parent)
     }
 
-    children(ent:Entity){
+    children(ent){
         return Array.from(ent.children.values()).map(id => this.map.get(id))
     }
 
-    descendants(ent:Entity){
+    descendants(ent){
         return this.children(ent).flatMap(ent => this.descendants(ent))
     }
 
-    duplicate(ent:Entity,amount:number):Entity[]{
+    duplicate(ent,amount){
         let res = []
         for(let i = 0; i < amount;i++){
-            let copy = Object.assign({},ent) as any
-            copy.__proto__ = (ent as any).__proto__
+            let copy = Object.assign({},ent)
+            copy.__proto__ = (ent).__proto__
             let obj = this.add(copy,ent._parent())    
             res.push(obj)
         }
@@ -98,7 +98,7 @@ export class EntityStore{
     }
 
 
-    flag(id:number){
+    flag(id){
         this.upserts.add(id)
     }
 
@@ -126,7 +126,7 @@ export class EntityStore{
         }
     }
 
-    applyChanges(deletions:number[],upserts:any[]){
+    applyChanges(deletions,upserts){
         for(let upsert of upserts){
             let local = this.get(upsert.id)
             if(local == null){
@@ -157,15 +157,15 @@ export class EntityStore{
     }
 
     //helper functions
-    getGame():Game{
-        return this.list().find(e => e.name == 'gameroot') as Game
+    getGame(){
+        return this.list().find(e => e.name == 'gameroot')
     }
 
-    getPlayers():Player[]{
-        return this.getGame().childByName('playerfolder')._children() as Player[]
+    getPlayers(){
+        return this.getGame().childByName('playerfolder')._children()
     }
 
-    getDeckFolder():Entity{
+    getDeckFolder(){
         return this.getGame().childByName('deck')
     }
 
@@ -173,29 +173,29 @@ export class EntityStore{
         return this.getGame().childByName('discardpile')
     }
 
-    getDiscardPile():Card[]{
-        return this.getDiscardFolder()._children() as Card[]
+    getDiscardPile(){
+        return this.getDiscardFolder()._children()
     }
 
-    getRoles():Role[]{
-        return this.getGame().childByName('rolesfolder')._children() as Role[]
+    getRoles(){
+        return this.getGame().childByName('rolesfolder')._children()
     }
 
-    getClientPlayer(clientid):Player{
+    getClientPlayer(clientid){
         return this.getPlayers().find(p => p.clientid == clientid)
     }
 }
 
 
 export class Entity{
-    id:number
-    name:string = ''
-    parent:number
-    type:string
-    children:number[] = []
-    store:EntityStore
+    id
+    name = ''
+    parent
+    type
+    children = []
+    store
 
-    onEvent:EventQueue = new EventQueue()
+    onEvent = new EventQueue()
 
     // onCreate
     // onDelete
@@ -203,12 +203,12 @@ export class Entity{
     // onTick
     // onDraw
 
-    constructor(init?:Partial<Entity>){
+    constructor(init){
         Object.assign(this,init)
         this.type = 'entity'
     }
 
-    ancestor(type:string){
+    ancestor(type){
         return this.store.ancestor(this,type)
     }
 
@@ -228,7 +228,7 @@ export class Entity{
         return this.store.duplicate(this,amount)
     }
 
-    setParent(parent:Entity){
+    setParent(parent){
         this.store.move(this,parent)
     }
 
@@ -236,7 +236,7 @@ export class Entity{
         this.store.flag(this.id)
     }
 
-    childByName(name):Entity{
+    childByName(name){
         return this._children().find(c => c.name == name)
     }
 
@@ -248,32 +248,32 @@ export class Entity{
 }
 
 
-export class Store<T>{
+export class Store{
 
-    map = new Map<number,T>()
+    map = new Map()
     counter = 0
 
     //add some kind of version number or hash verify
-    upserts = new Set<number>()
-    deletions = new Set<number>()
+    upserts = new Set()
+    deletions = new Set()
     versionnumber = 0
 
-    get(id:number){
+    get(id){
         return this.map.get(id)
     }
 
-    add(item:T){
-        (item as any).id = this.counter++
+    add(item){
+        (item).id = this.counter++
         return this.insert(item)
     }
 
-    insert(item:any){
-        this.map.set((item as any).id,item)
+    insert(item){
+        this.map.set((item).id,item)
         this.upserts.add(item.id)
         return item
     }
 
-    flag(id:number){
+    flag(id){
         //would be nicer if flagging was somehow done automatically
         //call this function in the setparent function of entitys
         this.upserts.add(id)
@@ -314,7 +314,7 @@ export class Store<T>{
         }
     }
 
-    applyChanges(deletions:number[],upserts:any[]){
+    applyChanges(deletions,upserts){
         for(let upsert of upserts){
             let local = this.get(upsert.id)
             if(local == null){

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card } from '../../shared/models'
 
-export function CardView(props:{card:Card,onClick}){
+export function CardView(props){
     let card = this.props.card
     return (
         <div className="card" style={{borderRadius:"3px",background:"black", border:"1px solid white", padding:"10px", margin:"10px", cursor:this.props.onClick != null ? 'pointer' : 'default'}} onClick={this.props.onClick}>

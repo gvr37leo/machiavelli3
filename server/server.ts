@@ -10,7 +10,7 @@ import {Server} from 'http'
 import {Server as IOServer} from 'socket.io'
 
 var gamemanager = new GameManager()
-var x = new SocketServer()
+var socketserver = new SocketServer()
 
 
 console.log('hello')
@@ -19,7 +19,7 @@ const http = new Server(app);
 const io = new IOServer(http);
 var port = process.env.PORT || 8000
 
-app.use(express.static(import.meta.url + '/client'))
+app.use(express.static('../'))
 
 // let socketserver = new SocketServer()
 // let gamemanager = new GameManager()
@@ -90,6 +90,7 @@ app.use(express.static(import.meta.url + '/client'))
 
 io.on('connection', (socket) => {
     
+    socketserver.connect(socket)
 
     console.log('socket connection')
     // server.onBroadcast.listen((message) => {

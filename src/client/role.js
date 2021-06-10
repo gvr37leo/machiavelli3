@@ -2,7 +2,7 @@ import React from 'react'
 import { Client } from '../client'
 import { Role } from '../../shared/models'
 
-export function RoleView(props:{role:Role, client:Client, onClick?}){
+export function RoleView(props){
 
     return (
         <div>

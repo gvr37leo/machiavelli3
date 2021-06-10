@@ -2,7 +2,7 @@ import {Entity} from './utils/store.js'
 
 export class Action{
     
-    constructor(public type:string){
+    constructor(type){
 
     }
 }
@@ -18,15 +18,15 @@ export class Game extends Entity{
     status = 'init'
     winnerid = 0
 
-    rolestopick:Role[] = []
-    opendiscardedroles:Role[] = []
-    closeddiscardedroles:Role[] = []
+    rolestopick = []
+    opendiscardedroles = []
+    closeddiscardedroles = []
     pickingplayerindex = 0
     kingshownRole = 0
-    actions: Action[]
+    actions
     actionindex = 0
 
-    constructor(init?:Partial<Game>){
+    constructor(init){
         super()
         Object.assign(this,init)
         this.type = 'game'
@@ -34,14 +34,14 @@ export class Game extends Entity{
 }
 
 export class Role extends Entity{
-    id:number
-    player:number
+    id
+    player
     color
     image
     specialUsed = false
     incomephaseTaken = false
 
-    constructor(init?:Partial<Role>){
+    constructor(init){
         super()
         Object.assign(this,init)
         this.type = 'role'
@@ -54,24 +54,24 @@ export class DiscoverOption{
     description
     value
 
-    constructor(init?:Partial<DiscoverOption>){
+    constructor(init){
         Object.assign(this,init)
     }
 }
 
 export class Player extends Entity{
-    id:number
-    hand:number[]
-    buildings:number[]
-    money:number
-    score:number
-    buildactions:number
-    specialUsed:boolean
-    isDiscovering:boolean
-    discoverOptions:DiscoverOption[]
+    id
+    hand = []
+    buildings = []
+    money
+    score
+    buildactions
+    specialUsed
+    isDiscovering
+    discoverOptions = []
     discoverid
-    discovermin: number
-    discovermax: number
+    discovermin
+    discovermax
     
     clientid
     socketid
@@ -80,7 +80,7 @@ export class Player extends Entity{
 
     
 
-    constructor(init?:Partial<Player>){
+    constructor(init){
         super()
         Object.assign(this,init)
         this.type = 'player'
@@ -88,7 +88,7 @@ export class Player extends Entity{
 }
 
 export class Card extends Entity{
-    id:number
+    id
     points
     isAction
     isAnyRole
@@ -97,7 +97,7 @@ export class Card extends Entity{
     cost
     image
 
-    constructor(init?:Partial<Card>){
+    constructor(init){
         super()
         Object.assign(this,init)
         this.type = 'card'

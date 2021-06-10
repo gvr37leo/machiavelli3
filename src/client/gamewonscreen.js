@@ -1,7 +1,7 @@
 import React from 'react'
 import { Client } from "../client"
 
-export function GameWonScreen(props:{client:Client}){
+export function GameWonScreen(props){
     let game = props.client.store.getGame()
     let players = props.client.store.getPlayers()
     let winningplayer = players.find(p => p.id == game.winnerid)

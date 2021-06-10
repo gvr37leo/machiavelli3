@@ -2,7 +2,7 @@ import React from 'react'
 import { Client } from '../client'
 import { Player } from '../../shared/models'
 
-export function RenderPlayer(props:{player:Player, client:Client, onClick?}){
+export function RenderPlayer(props){
     let currentplayer = props.client.store.getCurrentPlayer()
     let sessionplayer = props.client.store.getClientPlayer(props.client.socket.serverclientid)
     let boardcards = props.player.childByName('board')._children()

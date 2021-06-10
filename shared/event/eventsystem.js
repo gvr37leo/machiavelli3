@@ -1,8 +1,8 @@
-export class EventSystem<T>{
+export class EventSystem{
     idcounter = 0
-    listeners:{id:number, cb: (data: any) => void; }[] = []
+    listeners = []
 
-    listen(cb:(val:T) => void){
+    listen(cb){
         let listener = {
             id:this.idcounter++,
             cb:cb,
@@ -16,7 +16,7 @@ export class EventSystem<T>{
         this.listeners.splice(index,1)
     }
 
-    trigger(val:T){
+    trigger(val){
         for (let listener of this.listeners) {
             listener.cb(val)
         }
@@ -26,9 +26,9 @@ export class EventSystem<T>{
 export class GenericEvent{
 
     idcounter = 0
-    listeners:{id:number,type:string, cb: (data: any,type:string) => void; }[] = []
+    listeners = []
 
-    on(type,cb: (data: any,type:string) => void){
+    on(type,cb){
         let id = this.idcounter++
         this.listeners.push({id,cb,type})
         return id
@@ -38,7 +38,7 @@ export class GenericEvent{
         this.listeners.filter(l => l.type == type || l.type == 'any').forEach(l => l.cb(data,type))
     }
 
-    onany(cb: (data: any,type:string) => void){
+    onany(cb){
         this.on('any',cb)
     }
 }

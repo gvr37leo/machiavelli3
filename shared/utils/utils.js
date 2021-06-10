@@ -1,17 +1,16 @@
-import {Vector} from '../vector/vector.js'
 
 let TAU = Math.PI * 2
 export {TAU}
 
-export function map(val:number,from1:number,from2:number,to1:number,to2:number):number{
+export function map(val,from1,from2,to1,to2){
     return lerp(to1,to2,inverseLerp(val,from1,from2))
 }
 
-export function inverseLerp(val:number,a:number,b:number):number{
+export function inverseLerp(val,a,b){
     return to(a,val) / to(a,b)
 }
 
-export function inRange(min: number, max: number, value: number):boolean{
+export function inRange(min, max, value){
     if(min > max){
         let temp = min;
         min = max;
@@ -20,38 +19,25 @@ export function inRange(min: number, max: number, value: number):boolean{
     return value <= max && value >= min;
 }
 
-export function min(a: number, b: number): number{
+export function min(a, b){
     if(a < b)return a;
     return b;
 }
 
-export function max(a: number, b: number): number{
+export function max(a, b){
     if(a > b)return a;
     return b;
 }
 
-export function clamp(val: number, min: number, max: number): number{
+export function clamp(val, min, max){
     return this.max(this.min(val, max), min)
 }
 
-export function rangeContain(a1: number, a2: number, b1: number, b2: number):boolean{//as in does a enclose b----- so returns true if b is smaller in all ways
+export function rangeContain(a1, a2, b1, b2){//as in does a enclose b----- so returns true if b is smaller in all ways
     return max(a1, a2) >= max(b1, b2) && min(a1,a2) <= max(b1,b2);
 }
 
-export function startMouseListen(localcanvas:HTMLCanvasElement){
-    let mousepos = new Vector(0,0)
-    document.addEventListener('mousemove',(e) => {
-        mousepos.overwrite(getMousePos(localcanvas,e))
-    })
-    return mousepos
-}
-
-export function getMousePos(canvas:HTMLCanvasElement, evt:MouseEvent) {
-    let rect = canvas.getBoundingClientRect();
-    return new Vector(evt.clientX - rect.left, evt.clientY - rect.top)
-}
-
-export function createCanvas(x: number, y: number){
+export function createCanvas(x, y){
     let canvas = document.createElement('canvas')
     canvas.width = x;
     canvas.height = y;
@@ -60,7 +46,7 @@ export function createCanvas(x: number, y: number){
     return {ctxt:ctxt,canvas:canvas};
 }
 
-export function random(min: number, max: number){
+export function random(min, max){
     return Math.random() * (max - min) + min
 }
 
@@ -75,12 +61,12 @@ export function loop(callback){
     })
 }
 
-export function mod(number: number, modulus: number){
+export function mod(number, modulus){
     return ((number%modulus)+modulus)%modulus;
 }
 
 
-export function loadTextFiles(strings:string[]){
+export function loadTextFiles(strings){
     let promises = []
     for(let string of strings){
         let promise = fetch(string)
@@ -91,8 +77,8 @@ export function loadTextFiles(strings:string[]){
     return Promise.all(promises)
 }
 
-export function loadImages(urls:string[]):Promise<HTMLImageElement[]>{
-    let promises:Promise<HTMLImageElement>[] = []
+export function loadImages(urls){
+    let promises = []
 
     for(let url of urls){
         promises.push(new Promise((res,rej) => {
@@ -107,7 +93,7 @@ export function loadImages(urls:string[]):Promise<HTMLImageElement[]>{
     return Promise.all(promises)
 }
 
-export function findbestIndex<T>(list:T[], evaluator:(v:T) => number):number {
+export function findbestIndex(list, evaluator) {
     if (list.length < 1) {
         return -1;
     }
@@ -123,36 +109,36 @@ export function findbestIndex<T>(list:T[], evaluator:(v:T) => number):number {
     return bestIndex
 }
 
-export function string2html(string): HTMLElement {
+export function string2html(string) {
     let div = document.createElement('div')
     div.innerHTML = string;
-    return div.children[0] as HTMLElement;
+    return div.children[0];
 }
 
 
-export function lerp(a:number,b:number,r:number):number{
+export function lerp(a,b,r){
     return a + to(a,b) * r
 }
 
-export function to(a:number,b:number):number{
+export function to(a,b){
     return b - a;
 }
 
-export function swap<T>(arr:T[],a:number = 0,b:number = 1){
+export function swap(arr,a = 0,b = 1){
     let temp = arr[a];
     arr[a] = arr[b];
     arr[b] = temp;
 }
 
-export function first<T>(arr:T[]):T{
+export function first(arr){
     return arr[0]
 }
 
-export function last<T>(arr:T[]):T{
+export function last(arr){
     return arr[arr.length - 1]
 }
 
-export function create2DArray<T>(size:Vector,filler:(pos:Vector) => T){
+export function create2DArray(size,filler){
     let result = new Array(size.y)
     for(let i = 0; i < size.y;i++){
         result[i] = new Array(size.x)
@@ -163,15 +149,11 @@ export function create2DArray<T>(size:Vector,filler:(pos:Vector) => T){
     return result
 }
 
-export function get2DArraySize(arr:any[][]){
-    return new Vector(arr[0].length,arr.length)
-}
-
-export function index2D<T>(arr:T[][],i:Vector){
+export function index2D(arr,i){
     return arr[i.x][i.y]
 }
 
-export function copy2dArray<T>(arr:T[][]){
+export function copy2dArray(arr){
     return create2DArray(get2DArraySize(arr),pos => index2D(arr,pos))
 }
 
@@ -181,12 +163,12 @@ export function round(number,decimals){
 }
 
 export class RNG{
-    public mod:number = 4294967296
-    public multiplier:number = 1664525
-    public increment:number = 1013904223
+    mod = 4294967296
+    multiplier = 1664525
+    increment = 1013904223
 
-    constructor(public seed:number){
-
+    constructor(seed){
+        this.seed = seed
     }
 
     next(){
@@ -199,13 +181,13 @@ export class RNG{
     }
     
     
-    range(min:number,max:number){
+    range(min,max){
         return this.norm() * to(min,max) + min
     }
 }
 
 
-export function shuffle<T>(array:T[],rng:RNG){
+export function shuffle(array,rng){
     let currentIndex = array.length, temporaryValue, randomIndex;
     while (0 !== currentIndex) {
         randomIndex = Math.floor(rng.norm() * currentIndex);
@@ -225,14 +207,6 @@ export function remove(arr, value) {
       arr.splice(index, 1);
     }
     return arr;
-}
-
-declare global {
-    interface Array<T> {
-        remove(index: number):T
-        first():T
-        last():T
-    }
 }
 
 Array.prototype.remove = function (index) {

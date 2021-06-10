@@ -1,22 +1,21 @@
-import {EventSystem, GenericEvent} from '../shared/event/eventsystem'
-import {EntityStore,Entity} from '../shared/utils/store'
-import { to } from '../shared/utils/utils'
-import {MainApp} from './client/mainapp'
-import { EventQueue } from '../shared/event/eventqueue'
+import {EventSystem, GenericEvent} from '../shared/event/eventsystem.js'
+import {EntityStore,Entity} from '../shared/utils/store.js'
+import { to } from '../shared/utils/utils.js'
+import {MainApp} from './client/mainapp.js'
+import { EventQueue } from '../shared/event/eventqueue.js'
 
-declare let toastr
 
 export class Client{
 
-    root:JSX.Element
+    root
     output = new GenericEvent()
     input = new GenericEvent()
     special = new GenericEvent()
-    store:EntityStore = new EntityStore()
+    store = new EntityStore()
     lastprocessedversion = 0
 
     // <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
-    socket: any//socket.io socket
+    socket//socket.io socket
 
 
     constructor(){
@@ -62,7 +61,7 @@ export class Client{
         this.special.emit('updatehtml',null)
     }
 
-    deserialize(data:any[]){
+    deserialize(data){
         let entities = data
         let store = new EntityStore()
         

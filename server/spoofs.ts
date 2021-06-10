@@ -1,3 +1,4 @@
+import { Socket } from "socket.io"
 import { EventQueue } from "../shared/event/eventqueue.js"
 import { EventSystem, GenericEvent } from "../shared/event/eventsystem.js"
 import { Store } from '../shared/utils/store.js'
@@ -54,12 +55,14 @@ export class SocketServer{
     }
 
 
-    connect(socket:IServersideSocket){
+    connect(socket:Socket){
 
         this.sockets.add(socket)
 
         
+        socket.on('message',() => {
 
+        })
         
 
         socket.input.on('handshake', (data) => {
@@ -142,78 +145,5 @@ export class SpoofServersideSocket implements IServersideSocket{
 // ----------------------------------------------------------------------   CLIENT   -------------------------------------------------------------------------------
 
 
-export interface IClientSocket{
-    input:GenericEvent
-    output:GenericEvent
-    specials:GenericEvent
-    id
-    serverclientid
 
-    connect(serverorurl: SocketServer)
-}
-
-export class ClientSocket implements IClientSocket{
-
-
-    id = -1
-    input = new GenericEvent()
-    output = new GenericEvent()
-    specials = new GenericEvent()
-
-    serverclientid = -1
-    localdebug = true
-
-    // on(type: any, cb: any) {
-    //     this.input.on(type,cb)
-    // }
-    // emit(type: any, data: any) {
-    //     this.output.emit(type,data)
-    // }
-    
-    connect(serverorurl: SocketServer) {
-        let serversocket = new SpoofServersideSocket()
-        //handshake
-
-        this.input.onany((data,type) => {
-            serversocket.input.emit(type,data)
-        })
-
-        serversocket.output.onany((message,type) => {
-            this.output.emit(type,message)
-        })
-
-        this.specials.on('connect',() => {
-            console.log('connected')
-            //todo dit gaat fout op lokaal testen
-            let clientid = parseInt(sessionStorage.getItem('clientid'))
-            if(this.localdebug){
-                clientid = null
-            }
-
-            clientid = isNaN(clientid) ? null : clientid
-            this.input.emit('handshake', {clientid})
-        })
-
-        this.output.on('confirmhandshake',({ clientid,  socketid }) => {
-            sessionStorage.setItem('clientid',clientid)
-            this.serverclientid = clientid
-            this.id = socketid
-            this.specials.emit('confirmhandshake',{})
-        })
-
-        this.specials.on('disconnect',() => {
-            console.log('disconnected');
-        })
-
-        
-
-        serverorurl.connect(serversocket)
-
-        
-
-        this.specials.emit('connect',{})
-
-        
-    }
-}
 

@@ -4,11 +4,11 @@ import {first} from '../utils/utils.js'
 
 export class EventQueue{
     idcounter = 0
-    listeners:{id:number, type: string; cb: (data: any) => void; }[]
-    events:{type:string,data:any}[]
-    onProcessFinished = new EventSystem<any>()
-    onRuleBroken = new EventSystem<any>()
-    rules:{type:string,error:string,rulecb:(data: any) => boolean}[] = []
+    listeners
+    events
+    onProcessFinished = new EventSystem()
+    onRuleBroken = new EventSystem()
+    rules = []
     discoveryidcounter = 0
 
     constructor(){
@@ -26,7 +26,7 @@ export class EventQueue{
     //     this.addAndTrigger(type,{data,cb})
     // }
 
-    listenDiscovery(type: string, cb: (data: any, id: any) => void) {
+    listenDiscovery(type, cb) {
         this.listen(type,(discovery) => {
             cb(discovery.data,discovery.id)
         })
@@ -34,10 +34,10 @@ export class EventQueue{
 
 
     
-    startDiscovery(type: string, data: any, cb: (cbdata: any) => void) {
+    startDiscovery(type, data, cb) {
         let createdid = this.discoveryidcounter++
         
-        let listenerid = this.listen('completediscovery',(discovery:{data,id}) => {
+        let listenerid = this.listen('completediscovery',(discovery) => {
             if(discovery.data.id == createdid){
                 this.unlisten(listenerid)
                 cb(discovery.data.data)
@@ -46,12 +46,12 @@ export class EventQueue{
         this.addAndTrigger(type,{data,id: createdid})
     }
 
-    completeDiscovery(data: any, id: any) {
+    completeDiscovery(data, id) {
         this.addAndTrigger('completediscovery',{data,id})
     }
 
 
-    listen(type:string,cb:(data:any) => void){
+    listen(type,cb){
         let id = this.idcounter++
         this.listeners.push({
             id:id,
@@ -61,7 +61,7 @@ export class EventQueue{
         return id
     }
 
-    listenOnce(type:string,cb:(data:any) => void){
+    listenOnce(type,cb){
         let id = this.listen(type,(data) => {
             this.unlisten(id)
             cb(data)
@@ -69,7 +69,7 @@ export class EventQueue{
         return id
     }
 
-    unlisten(id:number){
+    unlisten(id){
         let index = this.listeners.findIndex(o => o.id == id)
         this.listeners.splice(index,1)
     }
@@ -94,19 +94,19 @@ export class EventQueue{
         this.onProcessFinished.trigger(0)
     }
     
-    add(type:string,data:any){
+    add(type,data){
         this.events.push({
             type: type,
             data:data,
         })
     }
 
-    addAndTrigger(type:string,data:any){
+    addAndTrigger(type,data){
         this.add(type,data)
         this.process()
     }
 
-    addRule(type,error,rulecb:(e:any) => boolean){
+    addRule(type,error,rulecb){
         this.rules.push({type,error,rulecb})
     }
 }

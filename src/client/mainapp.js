@@ -1,13 +1,11 @@
-import React from "react"
-import { Client } from "../client"
-import { GameWonScreen } from "./gamewonscreen"
-import { RenderHomepage } from "./homepage"
-import { StartScreen } from "./startscreen"
+import { GameWonScreen } from "./gamewonscreen.jsx"
+import { RenderHomepage } from "./homepage.jsx"
+import { StartScreen } from "./startscreen.jsx"
 
 
 let shown = false
 
-export function MainApp({client}:{client:Client}){
+export function MainApp({client}){
     let game = client.store.getGame()
     let players = client.store.getPlayers()
     let sessionplayer = client.store.getClientPlayer(client.socket.serverclientid)
